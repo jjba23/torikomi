@@ -10,6 +10,8 @@
 [[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] 
 [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 
+🚧 Work in progress!
+
 lispy-file-sink is a minimalist web service built with GNU Artanis and Guile Scheme. It provides a simple interface—both via a web form and a REST API—to "sink" (download) files from a remote URL directly into a local directory on your server.
 
 🚀 Features
