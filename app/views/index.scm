@@ -28,41 +28,20 @@
 
 (define* (lispy-file-sink-page G_)
   (html-template G_
-                 #:body `(div (div (@ (class ,(mk-class '(p-2))))
-                                   (div (@ (class ,(mk-class '(flex flex-row
-                                                               flex-wrap
-                                                               gap-5
-                                                               px-3
-                                                               align-center
-                                                               items-center
-                                                               justify-center
-                                                               py-6))))
-                                        ,(lispy-file-sink-explain G_))))))
+                 #:body `((section (h1 "lispy-file-sink")
+                                   (p
+                                    "simple interface to sink/download files from a remote URL directly into a directory on your server.")))))
 
 (define* (html-template G_
-                        #:key (title "Lispy-File-Sink") body
-                        (is-logged-in #f))
+                        #:key (title "lispy-file-sink") body)
   
   `(,doctype-html (html (head (title ,title)
-                              ,(hygguile-recommended-meta)
-                              ,(hygguile-recommended-resources)
                               (link (@ (rel "shortcut icon")
                                        (href "/favicon.ico")
                                        (type "image/x-icon")) "")
                               (link (@ (rel "icon")
                                        (href "/favicon.ico")
                                        (type "image/x-icon")) "")
-                              (link (@ (rel stylesheet)
-                                       (href "/css/olive.min.css"))
-                                    "")
 
                               )
-                        (body (@ (class ,(mk-class '(bg-stone-100
-                                                     dark:bg-onyx-900))))
-                              ((div (@ (class ,(mk-class '(flex flex-col
-                                                           justify-between
-                                                           min-h-96))))
-                                    (div (@ (class ,(mk-class '(flex flex-col
-                                                                gap-8
-                                                                justify-start))))
-                                         ,body)))))))
+                        (body ,body))))
