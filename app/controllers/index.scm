@@ -19,6 +19,7 @@
 
 (import (web uri)
         (ice-9 string-fun)
+        (kracht prelude)
         (app views index))
 
 (get "/"
@@ -27,6 +28,17 @@
      (lambda (rc)
        (response-emit (:mime rc
                              (lispy-file-sink-page (:i18n rc))))))
+
+(post "/sink-file"
+      #:mime 'xml
+      #:i18n '(cookie "lang")
+      (lambda (rc)
+        (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (response-emit (:mime rc
+                                (lispy-file-sink-page (:i18n rc)
+                                                      #:new-url (assoc-ref
+                                                                 body
+                                                                 "file-url")))))))
 
 (get "/robots.txt" static-page-emitter)
 (get "/favicon.ico" static-page-emitter)

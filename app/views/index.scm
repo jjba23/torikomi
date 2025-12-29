@@ -25,15 +25,22 @@
   #:use-module (ice-9 string-fun)
   #:export (lispy-file-sink-page))
 
-(define* (lispy-file-sink-page G_)
+(define* (lispy-file-sink-page G_ #:key new-url)
   (html-template G_
                  #:body `((section (h1 "lispy-file-sink")
                                    (p
                                     "simple interface to sink/download files from a remote URL directly into a directory on your server."))
-                          (section (form (input (@ (placeholder
-                                                    "Enter the file's URL here"))
-                                                "")
-                                         (button (@(type submit)) "Submit"))))))
+                          ,(if new-url `((p ,(format #f "new-url: ~a" new-url))) "")
+                          (section (form (@ (method POST)
+                                            (action "/sink-file"))
+                                         (label (@ (for "file-url"))
+                                                "File URL:")
+                                         (input (@ (placeholder
+                                                    "Enter the file's URL here")
+                                                   (type url)
+                                                   (required "")
+                                                   (name "file-url")) "")
+                                         (button (@ (type submit)) "Submit"))))))
 
 (define* (html-template G_
                         #:key (title "lispy-file-sink") body)
