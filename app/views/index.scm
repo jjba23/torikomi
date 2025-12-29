@@ -20,7 +20,6 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
-  #:use-module (hygguile hygguile)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
@@ -30,18 +29,20 @@
   (html-template G_
                  #:body `((section (h1 "lispy-file-sink")
                                    (p
-                                    "simple interface to sink/download files from a remote URL directly into a directory on your server.")))))
+                                    "simple interface to sink/download files from a remote URL directly into a directory on your server."))
+                          (section (form (input (@ (placeholder
+                                                    "Enter the file's URL here"))
+                                                "")
+                                         (button (@(type submit)) "Submit"))))))
 
 (define* (html-template G_
                         #:key (title "lispy-file-sink") body)
   
-  `(,doctype-html (html (head (title ,title)
-                              (link (@ (rel "shortcut icon")
-                                       (href "/favicon.ico")
-                                       (type "image/x-icon")) "")
-                              (link (@ (rel "icon")
-                                       (href "/favicon.ico")
-                                       (type "image/x-icon")) "")
-
-                              )
-                        (body ,body))))
+  `("<!DOCTYPE html>" (html (head (title ,title)
+                                  (link (@ (rel "shortcut icon")
+                                           (href "/favicon.ico")
+                                           (type "image/x-icon")) "")
+                                  (link (@ (rel "icon")
+                                           (href "/favicon.ico")
+                                           (type "image/x-icon")) ""))
+                            (body ,body))))
