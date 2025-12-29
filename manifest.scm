@@ -1,4 +1,4 @@
-;;; lispy-file-sink - the free music knowledge encyclopaedia
+;;; lispy-file-sink 
 
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
