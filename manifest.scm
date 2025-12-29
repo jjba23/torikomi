@@ -36,7 +36,6 @@
              (gnu packages tls)
              (gnu packages perl)
              (gnu packages compression)
-             (gnu packages sqlite)
              (gnu packages texinfo)
              (gnu packages autotools)
              ((guix licenses)
@@ -65,36 +64,6 @@
 standard hex-and-dash format of any variant and version. Simple routines for converting
 between binary and hex-and-dash string UUIDs are included.")
     (license license:gpl3+)))
-
-(define-public guile-hygguile
-  (package
-    (name "guile-hygguile")
-    (version "2.0.21")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://codeberg.org/jjba23/hygguile.git")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "04fpf46ibjb4x2qpzgwdhnjh7cjvzvn5fry0j4macdijhbwd59yf"))))
-    (build-system guile-build-system)
-    (native-inputs (list guile-3.0))
-    (arguments
-     (list
-      #:source-directory "src"))
-    (home-page "https://codeberg.org/jjba23/hygguile")
-    (synopsis "Web UI component library for Guile Scheme projects")
-    (description
-     "Hygguile is a library that allows you to create cozy web user-interfaces
-using Guile Scheme, by defining an expressive domain-specific language (DSL),
-and by leveraging the power of S-expressions, SXML and TailwindCSS.
-
-The project aims to provide reusable, professional-looking and accessible
-web components, whose names resemble the HTML counterparts, thus
-easing the learning curve, and reducing the cognitive load.")
-    (license license:lgpl3+)))
 
 (define-public guile-kracht
   (package
@@ -131,13 +100,9 @@ more efficient, and more powerful code.")
                           guile-uuid
                           guile-ares-rs
                           artanis
-                          guile-hygguile
                           guile-kracht
                           guile-curl
-                          sqlite
                           guile-gcrypt
-                          guile-dbi
-                          guile-dbd-sqlite3
                           watchexec
-                          emacs))
+                          emacs-no-x))
 
