@@ -103,6 +103,7 @@ more efficient, and more powerful code.")
                           guile-kracht
                           guile-curl
                           guile-gcrypt
+                          nss-certs
                           watchexec
                           emacs-no-x))
 

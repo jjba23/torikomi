@@ -21,6 +21,8 @@
         (ice-9 string-fun)
         (kracht prelude)
         (curl)
+        (web response)
+        (rnrs bytevectors)
         (app views index))
 
 (get "/"
@@ -37,26 +39,43 @@
   (let* ((handle (curl-easy-init))
          (_ (begin
               (curl-easy-setopt handle
+                                'header #t)
+              (curl-easy-setopt handle
                                 'url url)
               (curl-easy-setopt handle
                                 'verbose #t)
+              ;; (curl-easy-setopt handle
+              ;;                   'httpget #t)
               (curl-easy-setopt handle
-                                'httpget #t)
+                                'maxredirs 10)
               (curl-easy-setopt handle
                                 'followlocation follow-redirects)
               (curl-easy-setopt handle
                                 'timeout timeout-seconds)
-              (curl-easy-setopt handle
-                                'use-ssl 1)))
-         (r (curl-easy-perform handle #t)))
-    (display (format #f "\nresponse: ~a\n" r)) r))
+              ;; (curl-easy-setopt handle
+              ;;                   'use-ssl 1)
+              ))
+         (response-string (curl-easy-perform handle))
+
+         ;; Create a string port from the response
+         (response-port (open-input-string response-string))
+
+         ;; Have the (web response) module to parse the response
+         (response (read-response response-port))
+         ;; Have the (web response) module extract the body from the
+         ;; response
+         (response-body (read-response-body response)))
+    (display (format #f "The body contains ~a bytes~%"
+                     (bytevector-length response-body)))
+    (display (format #f "\nresponse data: ~a\n" response-body)) response-body))
 
 (post "/sink-file"
       #:mime 'xml
       #:i18n '(cookie "lang")
       (lambda (rc)
-        (let* ((body (alist-from-url-encoded-body (rc-body rc))))
-          (fetch-file #:url (assoc-ref body "file-url"))
+        (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+               (_ (fetch-file #:url (assoc-ref body "file-url"))))
+          
           (response-emit (:mime rc
                                 (lispy-file-sink-page (:i18n rc)
                                                       #:new-url (assoc-ref
