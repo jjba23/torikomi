@@ -44,26 +44,19 @@
                                 'url url)
               (curl-easy-setopt handle
                                 'verbose #t)
-              ;; (curl-easy-setopt handle
-              ;;                   'httpget #t)
+              (curl-easy-setopt handle
+                                'ssl-verifyhost #f)
+              (curl-easy-setopt handle
+                                'ssl-verifypeer #f)
               (curl-easy-setopt handle
                                 'maxredirs 10)
               (curl-easy-setopt handle
                                 'followlocation follow-redirects)
               (curl-easy-setopt handle
-                                'timeout timeout-seconds)
-              ;; (curl-easy-setopt handle
-              ;;                   'use-ssl 1)
-              ))
+                                'timeout timeout-seconds)))
          (response-string (curl-easy-perform handle))
-
-         ;; Create a string port from the response
          (response-port (open-input-string response-string))
-
-         ;; Have the (web response) module to parse the response
          (response (read-response response-port))
-         ;; Have the (web response) module extract the body from the
-         ;; response
          (response-body (read-response-body response)))
     (display (format #f "The body contains ~a bytes~%"
                      (bytevector-length response-body)))
