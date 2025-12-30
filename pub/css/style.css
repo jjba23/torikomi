@@ -18,7 +18,6 @@
 :root {
 	/* Color Palette */
 	--primary: #4466ff;
-	--primary-hover: #3352cc;
 	--accent: #ff9800;
 	--text-main: #2d3436;
 	--text-light: #636e72;
@@ -28,8 +27,8 @@
 
 	/* Spacing & Borders */
 	--radius: 12px;
-	--gap: 0.75rem;
-	--pad: 0.75rem;
+	--gap: 0.6rem;
+	--pad: 0.6rem;
 	--max-width: 650px;
 
 	/* Transitions */
@@ -87,7 +86,7 @@ input:focus {
 }
 
 button {
-	padding: var(--pad) 1.5rem;
+	padding: var(--pad) 1.0rem;
 	cursor: pointer;
 	font-weight: 600;
 	border-radius: var(--radius);
@@ -98,7 +97,7 @@ button {
 }
 
 button:hover {
-	background-color: var(--primary-hover);
+	background-color: var(--accent);
 	transform: translateY(-1px);
 }
 

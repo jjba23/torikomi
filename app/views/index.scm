@@ -26,19 +26,20 @@
   #:use-module (lispy-file-sink html)
   #:export (lispy-file-sink-page))
 
-(define* (lispy-file-sink-page G_ #:key new-url)
+(define* (lispy-file-sink-page G_
+                               #:key new-url)
   (html-template G_
-                 #:body `((section (h1 (a (@(class "overline")(href "/")) "λ lispy-file-sink"))
-                                   (small  (em
-                                    "powered by Lisp (Guile Scheme)"))
-                                   (p (@(class "py-4"))
-                                    "simple interface to sink/download files from a remote URL directly into a directory on your server.")
-                                                                     )
-                          ,(if new-url `((p ,(format #f "new-url: ~a" new-url))) "")
+                 #:body `((section (h1 (a (@ (class "overline")
+                                             (href "/")) "λ lispy-file-sink"))
+                                   (small (em "powered by Lisp (Guile Scheme)"))
+                                   (p (@ (class "py-4"))
+                                    "simple interface to sink/download files from a remote URL directly into a directory on your server."))
+                          ,(if new-url
+                               `((p ,(format #f "new-url: ~a" new-url))) "")
                           (section (form (@ (method POST)
                                             (action "/sink-file")
                                             (class "py-4"))
-                                         
+
                                          (label (@ (for "file-url"))
                                                 "File URL:")
                                          (input (@ (placeholder
@@ -48,17 +49,25 @@
                                                    (id file-url)
                                                    (name file-url)) "")
                                          (button (@ (type submit)) "Submit")))
-                          (footer (@(class "py-12 flex flex-row flex-wrap"))
-                           (small (em "find the source code for this program here:"))
-                           (a (@(class "underline")(href "https://codeberg.org/jjba23/lispy-file-sink"))  "codeberg.org/jjba23/lispy-file-sink")))))
+                          (footer (@ (class "py-12 flex flex-row flex-wrap"))
+                                  (small (em
+                                          "find the source code for this program here:"))
+                                  (a (@ (class "underline")
+                                        (href
+                                         "https://codeberg.org/jjba23/lispy-file-sink"))
+                                     "codeberg.org/jjba23/lispy-file-sink")))))
 
 (define* (html-template G_
                         #:key (title "lispy-file-sink") body)
   
   `("<!DOCTYPE html>" (html (head (title ,title)
-(meta (@(charset "UTF-8")) "")
-(meta (@(name viewport)(content "width=device-width, initial-scale=1.0")) "")
-                                  (style ,(assoc-ref asset-library "pub/css/style.css"))
+                                  (meta (@ (charset "UTF-8")) "")
+                                  (meta (@ (name viewport)
+                                           (content
+                                            "width=device-width, initial-scale=1.0"))
+                                        "")
+                                  (style ,(assoc-ref asset-library
+                                                     "pub/css/style.css"))
                                   (link (@ (rel "shortcut icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")) "")

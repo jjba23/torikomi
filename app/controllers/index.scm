@@ -20,6 +20,7 @@
 (import (web uri)
         (ice-9 string-fun)
         (kracht prelude)
+        (curl)
         (app views index))
 
 (get "/"
@@ -29,11 +30,33 @@
        (response-emit (:mime rc
                              (lispy-file-sink-page (:i18n rc))))))
 
+(define* (fetch-file #:key url
+                     (timeout-seconds 120)
+                     (follow-redirects #t))
+  (display (format #f "\nfetching URL: ~a\n" url))
+  (let* ((handle (curl-easy-init))
+         (_ (begin
+              (curl-easy-setopt handle
+                                'url url)
+              (curl-easy-setopt handle
+                                'verbose #t)
+              (curl-easy-setopt handle
+                                'httpget #t)
+              (curl-easy-setopt handle
+                                'followlocation follow-redirects)
+              (curl-easy-setopt handle
+                                'timeout timeout-seconds)
+              (curl-easy-setopt handle
+                                'use-ssl 1)))
+         (r (curl-easy-perform handle #t)))
+    (display (format #f "\nresponse: ~a\n" r)) r))
+
 (post "/sink-file"
       #:mime 'xml
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (fetch-file #:url (assoc-ref body "file-url"))
           (response-emit (:mime rc
                                 (lispy-file-sink-page (:i18n rc)
                                                       #:new-url (assoc-ref
