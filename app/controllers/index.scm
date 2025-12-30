@@ -61,10 +61,12 @@
          (response-string (curl-easy-perform handle))
          (response-port (open-input-string response-string))
          (response (read-response response-port))
-         (response-body (read-response-body response)))
+         (response-content-type (response-content-type response))
+         (response-body (read-response-body response))
+         (destination-file (format #f "tmp/~a.~a" last-url-piece response-content-type)))
     (display (format #f "The body contains ~a bytes~%"
                      (bytevector-length response-body)))
-    (call-with-output-file (format #f "tmp/~a" last-url-piece)
+    (call-with-output-file destination-file
       (lambda (port)
         (put-bytevector port response-body))
       #:binary #t) response-body))
