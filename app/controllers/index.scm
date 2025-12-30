@@ -61,9 +61,11 @@
          (response-string (curl-easy-perform handle))
          (response-port (open-input-string response-string))
          (response (read-response response-port))
-         (response-content-type (response-content-type response))
+         (response-content-type (cadr (string-split (format #f "~a" (car (response-content-type
+                                                          response))) #\/)))
          (response-body (read-response-body response))
-         (destination-file (format #f "tmp/~a.~a" last-url-piece response-content-type)))
+         (destination-file (format #f "tmp/~a.~a" last-url-piece
+                                   response-content-type)))
     (display (format #f "The body contains ~a bytes~%"
                      (bytevector-length response-body)))
     (call-with-output-file destination-file
