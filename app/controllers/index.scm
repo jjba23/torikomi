@@ -19,6 +19,7 @@
 
 (import (web uri)
         (ice-9 string-fun)
+        (ice-9 binary-ports)
         (kracht prelude)
         (curl)
         (web response)
@@ -36,7 +37,8 @@
                      (timeout-seconds 120)
                      (follow-redirects #t))
   (display (format #f "\nfetching URL: ~a\n" url))
-  (let* ((handle (curl-easy-init))
+  (let* ((last-url-piece (car (reverse (string-split url #\/))))
+         (handle (curl-easy-init))
          (_ (begin
               (curl-easy-setopt handle
                                 'header #t)
@@ -51,6 +53,8 @@
               (curl-easy-setopt handle
                                 'maxredirs 10)
               (curl-easy-setopt handle
+                                'http-version 2)
+              (curl-easy-setopt handle
                                 'followlocation follow-redirects)
               (curl-easy-setopt handle
                                 'timeout timeout-seconds)))
@@ -60,7 +64,10 @@
          (response-body (read-response-body response)))
     (display (format #f "The body contains ~a bytes~%"
                      (bytevector-length response-body)))
-    (display (format #f "\nresponse data: ~a\n" response-body)) response-body))
+    (call-with-output-file (format #f "tmp/~a" last-url-piece)
+      (lambda (port)
+        (put-bytevector port response-body))
+      #:binary #t) response-body))
 
 (post "/sink-file"
       #:mime 'xml
