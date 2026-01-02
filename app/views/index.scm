@@ -27,13 +27,18 @@
   #:export (torikomi-page))
 
 (define* (torikomi-page G_
-                               #:key new-url)
+                        #:key new-url)
   (html-template G_
                  #:body `((section (h1 (a (@ (class "overline")
                                              (href "/")) "λ torikomi"))
                                    (small (em "powered by Lisp (Guile Scheme)"))
                                    (p (@ (class "py-4"))
                                     "simple interface to sink/download files from a remote URL directly into a directory on your server."))
+                          (section (figure (img (@ (width 128)
+                                                   (height auto)
+                                                   (src
+                                                    "https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png"))
+                                                "")))
                           ,(if new-url
                                `((p ,(format #f "new-url: ~a" new-url))) "")
                           (section (form (@ (method POST)

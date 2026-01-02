@@ -154,3 +154,7 @@ p {
 .flex-row {
 	flex-direction: row
 }
+
+img {
+    border-radius: var(--radius);
+}

@@ -18,6 +18,8 @@ torikomi is a minimalist web service built with GNU Artanis and Guile Scheme.
 
 It provides a simple interface—both via a web form and a REST API—to *"sink" (download) files from a remote URL directly into a local directory* on your server.
 
+[[https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png]]
+
 🚀 Features
 - Dual Interface: Supports traditional HTML forms and modern JSON REST endpoints.
 - Minimalist Core: Built on the powerful Guile Scheme language.
