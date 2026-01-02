@@ -26,7 +26,6 @@
 (define hot-reload-file-types
   '(scm css js))
 
-
 (define (repl)
   "Development REPL."
   (time-machine-manifest-shell '("guile -L ./lib -L ."
@@ -74,3 +73,10 @@
   "Target to start the torikomi server with the production configuration."
   (kill-server)
   (time-machine-manifest-shell '("art work -c conf/production.conf")))
+
+(define (test-local-api-call)
+  "Test out a local REST API call."
+  ($ '("http POST localhost:50027/sink-file"
+       "file-url=https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png")))
+
+
