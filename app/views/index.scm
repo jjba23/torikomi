@@ -41,8 +41,9 @@
                                                 "")))
                           ,(if new-url
                                `((p ,(format #f "new-url: ~a" new-url))) "")
-                                                    ,(if file-url
-                               `((small ,(format #f "file-url: ~a" file-url))) "")
+                          ,(if file-url
+                               `((small ,(format #f "file-url: ~a" file-url)))
+                               "")
                           (section (form (@ (method POST)
                                             (action "/sink-file")
                                             (class "py-4"))

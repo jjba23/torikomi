@@ -24,7 +24,6 @@
         (torikomi torikomi)
         (curl)
         (web response)
-        (torikomi env)
         (rnrs bytevectors)
         (app views index))
 
@@ -40,10 +39,7 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-               (new-url (fetch-file #:url (assoc-ref body "file-url")
-                                    #:timeout-seconds
-                                    torikomi-curl-timeout-seconds)))
-          
+               (new-url (fetch-file #:url (assoc-ref body "file-url"))))
           (response-emit (:mime rc
                                 (torikomi-page (:i18n rc)
                                                #:file-url (assoc-ref body

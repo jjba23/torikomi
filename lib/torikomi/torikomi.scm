@@ -53,9 +53,7 @@
           (if (>= (length parts) 2)
               (cadr parts) "bin")) "bin")))
 
-(define* (fetch-file #:key url
-                     (timeout-seconds 60)
-                     (follow-redirects #t))
+(define* (fetch-file #:key url)
   (display (format #f "\nfetching URL: ~a\n" url))
   (let* ((sink-file-directory torikomi-sink-file-directory)
          (sink-file-base-url torikomi-sink-file-base-url)
@@ -77,9 +75,9 @@
               (curl-easy-setopt handle
                                 'http-version 2)
               (curl-easy-setopt handle
-                                'followlocation follow-redirects)
+                                'followlocation #t)
               (curl-easy-setopt handle
-                                'timeout timeout-seconds)))
+                                'timeout torikomi-curl-timeout-seconds)))
          (headers-and-bts (curl-easy-perform handle #t #t))
          (heads (car headers-and-bts))
          (bts (cadr headers-and-bts))
@@ -92,7 +90,9 @@
                                       (format #f "~a" last-url-piece)
                                       (format #f "~a.~a" last-url-piece
                                               response-content-type)))
-                               (nn (string-join (drop-right (string-split n #\.) 1) "."))
+                               (nn (string-join (drop-right (string-split n
+                                                                          #\.)
+                                                            1) "."))
                                (ext (car (reverse (string-split n #\.)))))
                           (if (file-exists? (format #f "~a/~a"
                                                     sink-file-directory n))
