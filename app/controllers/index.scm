@@ -71,20 +71,18 @@
     (call-with-output-file destination-file
       (lambda (port)
         (put-bytevector port response-body))
-      #:binary #t) response-body))
+      #:binary #t) destination-file))
 
 (post "/sink-file"
       #:mime 'xml
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-               (_ (fetch-file #:url (assoc-ref body "file-url"))))
+               (new-file-path (fetch-file #:url (assoc-ref body "file-url"))))
           
           (response-emit (:mime rc
                                 (lispy-file-sink-page (:i18n rc)
-                                                      #:new-url (assoc-ref
-                                                                 body
-                                                                 "file-url")))))))
+                                                      #:new-url new-file-path))))))
 
 (get "/robots.txt" static-page-emitter)
 (get "/favicon.ico" static-page-emitter)
