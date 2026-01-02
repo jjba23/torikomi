@@ -18,6 +18,7 @@
 (define-module (torikomi fetch)
   #:use-module (torikomi env)
   #:use-module (web uri)
+  #:use-module (uuid generate)
   #:use-module (web response)
   #:use-module (rnrs bytevectors)
   #:use-module (json)
@@ -84,10 +85,16 @@
          (response-content-type (find-content-type-in-headers (car
                                                                headers-and-bts)))
          (extension (string-append "." response-content-type))
-         (new-file-name (if (string-suffix-ci? extension last-url-piece)
-                            (format #f "~a" last-url-piece) 
-                            (format #f "~a.~a" last-url-piece
-                                    response-content-type)))
+         (new-uid (generate-string-uuid))
+         (new-file-name (let ((n (if (string-suffix-ci? extension
+                                                        last-url-piece)
+                                     (format #f "~a" last-url-piece)
+                                     (format #f "~a.~a" last-url-piece
+                                             response-content-type))))
+                          (if (file-exists? (format #f "~a/~a"
+                                                    sink-file-directory n))
+                              (format #f "~a-~a" new-uid n)
+                              (format #f "~a" n))))
          (destination-file (format #f "~a/~a" sink-file-directory
                                    new-file-name))
          (new-url (format #f "~a/~a" sink-file-base-url new-file-name)))
