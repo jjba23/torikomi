@@ -32,14 +32,17 @@ The most important endpoints:
 ~GET /~ is the homepage, ~POST /sink-file~ is the form endpoint to submit files to sink, ~POST /api/v1/sink-file~ is the REST API endpoint to submit files to sink
 
 A ~env.scm~ file is expected at the root of the project. Important variables:
-#+begin_example
+
+#+begin_src scheme
 (define-module (torikomi env))
 
 (define-public torikomi-sink-file-directory "pub/tmp")
 
 (define-public torikomi-sink-file-base-url "http://localhost:50027/tmp")
 
-#+end_example
+(define-public torikomi-curl-timeout-seconds 60)
+
+#+end_src
 
 --------
 

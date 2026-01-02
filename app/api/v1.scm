@@ -21,6 +21,7 @@
         (ice-9 string-fun)
         (ice-9 binary-ports)
         (kracht prelude)
+        (torikomi env)
         (torikomi torikomi)
         (curl)
         (json)
@@ -32,7 +33,8 @@
       #:mime 'json
       (lambda (rc)
         (let* ((body (json-string->scm (utf8->string (rc-body rc))))
-               (new-url (fetch-file #:url (assoc-ref body "file-url"))))
+               (new-url (fetch-file #:url (assoc-ref body "file-url")
+                                    #:timeout-seconds torikomi-curl-timeout-seconds)))
           (:mime rc
                  `((file-url unquote (assoc-ref body "file-url"))
                    (new-url unquote new-url))))))
