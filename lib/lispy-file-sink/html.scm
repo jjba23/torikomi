@@ -32,7 +32,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (srfi srfi-19)
   #:use-module (ice-9 textual-ports)
-  #:export (asset-library ))
+  #:export (asset-library))
 
 (define* asset-library
   (build-asset-library '("pub/css/style.css")))
