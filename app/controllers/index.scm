@@ -1,19 +1,19 @@
-;;; lispy-file-sink 
+;;; torikomi 
 
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; lispy-file-sink is free software: you can redistribute it and/or modify
+;; torikomi is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU Affero General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
 
-;; lispy-file-sink is distributed in the hope that it will be useful,
+;; torikomi is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU Affero General Public License for more details.
 
 ;; You should have received a copy of the GNU Affero General Public License
-;; along with lispy-file-sink.  If not, see <https://www.gnu.org/licenses/>.
+;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-artanis-controller index)
 
@@ -21,7 +21,7 @@
         (ice-9 string-fun)
         (ice-9 binary-ports)
         (kracht prelude)
-        (lispy-file-sink fetch)
+        (torikomi fetch)
         (curl)
         (web response)
         (rnrs bytevectors)
@@ -32,7 +32,7 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                             (lispy-file-sink-page (:i18n rc))))))
+                             (torikomi-page (:i18n rc))))))
 
 (post "/sink-file"
       #:mime 'xml
@@ -42,7 +42,7 @@
                (new-file-path (fetch-file #:url (assoc-ref body "file-url"))))
           
           (response-emit (:mime rc
-                                (lispy-file-sink-page (:i18n rc)
+                                (torikomi-page (:i18n rc)
                                                       #:new-url new-file-path))))))
 
 (get "/robots.txt" static-page-emitter)
