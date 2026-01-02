@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (torikomi fetch)
+(define-module (torikomi torikomi)
   #:use-module (srfi srfi-1)
   #:use-module (torikomi env)
   #:use-module (web uri)

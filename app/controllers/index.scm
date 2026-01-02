@@ -21,7 +21,7 @@
         (ice-9 string-fun)
         (ice-9 binary-ports)
         (kracht prelude)
-        (torikomi fetch)
+        (torikomi torikomi)
         (curl)
         (web response)
         (rnrs bytevectors)
