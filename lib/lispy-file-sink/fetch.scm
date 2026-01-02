@@ -17,8 +17,10 @@
 
 (define-module (lispy-file-sink fetch)
   #:use-module (web uri)
+  #:use-module (web response)
+  #:use-module (rnrs bytevectors)
   #:use-module (json)
-    #:use-module (curl)
+  #:use-module (curl)
   #:use-module (ice-9 popen)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 time)
@@ -29,8 +31,28 @@
   #:use-module (ice-9 threads)
   #:use-module (kracht prelude)
   #:use-module (srfi srfi-19)
-  #:use-module (ice-9 textual-ports)
+  #:use-module (ice-9 binary-ports)
   #:export (fetch-file))
+
+(define (find-content-type-in-headers raw-headers)
+  (let* ((headers (string-split (string-replace-substring raw-headers "\r\n"
+                                                          "\n") #\newline))
+         (maybe-content-type-line (filter (lambda (h)
+                                            (string-prefix-ci? "content-type:"
+                                             h)) headers)))
+    
+    (if (eq? 1
+             (length maybe-content-type-line))
+        (let* ((_ (write maybe-content-type-line))
+               (full-line (car maybe-content-type-line))
+               ;; 1. Get everything after "Content-Type: "
+               (value-part (string-trim-both (cadr (string-split full-line #\:))))
+               ;; 2. Strip parameters (anything after ;)
+               (mime-only (string-trim-both (car (string-split value-part #\;))))
+               ;; 3. Split "image/png" -> ("image" "png")
+               (parts (string-split mime-only #\/)))
+          (if (>= (length parts) 2)
+              (cadr parts) "bin")) "png")))
 
 (define* (fetch-file #:key url
                      (timeout-seconds 120)
@@ -38,35 +60,33 @@
   (display (format #f "\nfetching URL: ~a\n" url))
   (let* ((last-url-piece (car (reverse (string-split url #\/))))
          (handle (curl-easy-init))
-         ;; We will use a list to accumulate chunks of bytevectors
-         (accumulated-data '()))
-    
-    (curl-easy-setopt handle 'url url)
-    (curl-easy-setopt handle 'followlocation follow-redirects)
-    (curl-easy-setopt handle 'timeout timeout-seconds)
-    (curl-easy-setopt handle 'ssl-verifyhost 0)
-    (curl-easy-setopt handle 'ssl-verifypeer 0)
-
-    ;; Correct way: Use a write-function to catch raw bytes
-    (curl-easy-setopt handle 'writefunction 
-      (lambda (data)
-        (set! accumulated-data (cons data accumulated-data))
-        (bytevector-length data)))
-
-    (curl-easy-perform handle)
-    (curl-easy-cleanup handle)
-
-    (let* ((response-body (u8-list->bytevector (reverse (apply append (map bytevector->u8-list accumulated-data)))))
-           (content-type (curl-easy-getinfo handle 'content-type))
-           ;; Note: You might want to get the extension via headers properly, 
-           ;; but for simplicity, we'll keep your naming logic or use a default.
-           (destination-file (format #f "tmp/~a" last-url-piece)))
-      
-      (display (format #f "The body contains ~a bytes~%" (bytevector-length response-body)))
-      
-      (call-with-output-file destination-file
-        (lambda (port)
-          (put-bytevector port response-body))
-        #:binary #t)
-      
-      destination-file)))
+         (_ (begin
+              (curl-easy-setopt handle
+                                'header #f)
+              (curl-easy-setopt handle
+                                'url url)
+              (curl-easy-setopt handle
+                                'verbose #f)
+              (curl-easy-setopt handle
+                                'ssl-verifyhost #f)
+              (curl-easy-setopt handle
+                                'ssl-verifypeer #f)
+              (curl-easy-setopt handle
+                                'maxredirs 10)
+              (curl-easy-setopt handle
+                                'http-version 2)
+              (curl-easy-setopt handle
+                                'followlocation follow-redirects)
+              (curl-easy-setopt handle
+                                'timeout timeout-seconds)))
+         (headers-and-bts (curl-easy-perform handle #t #t))
+         (heads (car headers-and-bts))
+         (bts (cadr headers-and-bts))
+         (response-content-type (find-content-type-in-headers (car
+                                                               headers-and-bts)))
+         (destination-file (format #f "tmp/~a.~a" last-url-piece
+                                   response-content-type)))
+    (call-with-output-file destination-file
+      (lambda (port)
+        (put-bytevector port bts))
+      #:binary #t) destination-file))
