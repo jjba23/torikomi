@@ -16,6 +16,7 @@
 ;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (torikomi fetch)
+  #:use-module (torikomi env)
   #:use-module (web uri)
   #:use-module (web response)
   #:use-module (rnrs bytevectors)
@@ -58,7 +59,9 @@
                      (timeout-seconds 120)
                      (follow-redirects #t))
   (display (format #f "\nfetching URL: ~a\n" url))
-  (let* ((last-url-piece (car (reverse (string-split url #\/))))
+  (let* ((sink-file-directory torikomi-sink-file-directory)
+         (sink-file-base-url torikomi-sink-file-base-url)
+         (last-url-piece (car (reverse (string-split url #\/))))
          (handle (curl-easy-init))
          (_ (begin
               (curl-easy-setopt handle
@@ -85,12 +88,16 @@
          (response-content-type (find-content-type-in-headers (car
                                                                headers-and-bts)))
          (extension (string-append "." response-content-type))
-         (destination-file (if (string-suffix-ci? extension last-url-piece)
-                               (format #f "tmp/~a" last-url-piece) ;Extension exists, don't add it
-                               (format #f "tmp/~a.~a" last-url-piece
-                                       response-content-type))))
+         (new-file-name (if (string-suffix-ci? extension last-url-piece)
+                            (format #f "~a" last-url-piece) ;Extension exists, don't add it
+                            (format #f "~a.~a" last-url-piece
+                                    response-content-type)))
+         (destination-file (format #f "~a/~a" sink-file-directory
+                                   new-file-name))
+         (new-url (format #f "~a/~a" sink-file-base-url new-file-name)))
+    (display (format #f "\nwriting file to ~a\n" destination-file))
     (call-with-output-file destination-file
       (lambda (port)
         (put-bytevector port bts))
-      #:binary #t) destination-file))
+      #:binary #t) new-url))
 
