@@ -84,9 +84,13 @@
          (bts (cadr headers-and-bts))
          (response-content-type (find-content-type-in-headers (car
                                                                headers-and-bts)))
-         (destination-file (format #f "tmp/~a.~a" last-url-piece
-                                   response-content-type)))
+         (extension (string-append "." response-content-type))
+         (destination-file (if (string-suffix-ci? extension last-url-piece)
+                               (format #f "tmp/~a" last-url-piece) ;Extension exists, don't add it
+                               (format #f "tmp/~a.~a" last-url-piece
+                                       response-content-type))))
     (call-with-output-file destination-file
       (lambda (port)
         (put-bytevector port bts))
       #:binary #t) destination-file))
+
