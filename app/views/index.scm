@@ -27,7 +27,7 @@
   #:export (torikomi-page))
 
 (define* (torikomi-page G_
-                        #:key new-url)
+                        #:key file-url new-url)
   (html-template G_
                  #:body `((section (h1 (a (@ (class "overline")
                                              (href "/")) "λ torikomi"))
@@ -41,6 +41,8 @@
                                                 "")))
                           ,(if new-url
                                `((p ,(format #f "new-url: ~a" new-url))) "")
+                                                    ,(if file-url
+                               `((small ,(format #f "file-url: ~a" file-url))) "")
                           (section (form (@ (method POST)
                                             (action "/sink-file")
                                             (class "py-4"))

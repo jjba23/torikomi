@@ -76,7 +76,7 @@
 
 (define (test-local-api-call)
   "Test out a local REST API call."
-  ($ '("http POST localhost:50027/sink-file"
+  ($ '("http POST localhost:50027/api/v1/sink-file"
        "file-url=https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png")))
 
 

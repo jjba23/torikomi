@@ -28,11 +28,12 @@
         (rnrs bytevectors)
         (app views index))
 
-(post "/sink-file"
+(post "/api/v1/sink-file"
       #:mime 'json
       (lambda (rc)
         (let* ((body (json-string->scm (utf8->string (rc-body rc))))
-               (new-file-path (fetch-file #:url (assoc-ref body "file-url"))))
+               (new-url (fetch-file #:url (assoc-ref body "file-url"))))
           (:mime rc
-                 `((new-file-path unquote new-file-path))))))
+                 `((file-url unquote (assoc-ref body "file-url"))
+                   (new-url unquote new-url))))))
 
