@@ -43,13 +43,14 @@
               "simple interface to sink/download files from a remote URL directly into a directory on your server."))))
 
 (define* (url-show-section #:key file-url new-url)
-  `((section (@(class ,(mk-class '(px-6 md:px-16)))) ,(if new-url
+  `((section (@ (class ,(mk-class '(px-6 md:px-16))))
+             ,(if new-url
                   `((p (@ (class ,(mk-class '(text-md text-onyx-500
                                                       dark:text-stone-500))))
                        ,(format #f "new-url: ~a" new-url))) "")
              ,(if file-url
                   `((small (@ (class ,(mk-class '(pt-4 text-sm text-onyx-300
-                                                          dark:text-stone-900))))
+                                                       dark:text-stone-900))))
                            ,(format #f "given file-url: ~a" file-url))) ""))))
 
 (define (footer-section)
