@@ -24,39 +24,53 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
   #:use-module (torikomi html)
+  #:use-module (hygguile hygguile)
   #:export (torikomi-page))
 
 (define* (torikomi-page G_
                         #:key file-url new-url)
   (html-template G_
-                 #:body `((section (h1 (a (@ (class "overline")
+                 #:body `((section (@ (class ,(mk-class '(py-4 px-2))))
+                                   (h1 (a (@ (class ,(mk-class '(overline
+                                                                 text-lg
+                                                                 font-bold)))
                                              (href "/")) "λ torikomi"))
                                    (small (em "powered by Lisp (Guile Scheme)"))
                                    (p (@ (class "py-4"))
                                     "simple interface to sink/download files from a remote URL directly into a directory on your server."))
-                          (section (figure (img (@ (width 128)
-                                                   (height auto)
-                                                   (src
-                                                    "https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png"))
-                                                "")))
-                          ,(if new-url
-                               `((p ,(format #f "new-url: ~a" new-url))) "")
-                          ,(if file-url
-                               `((small ,(format #f "file-url: ~a" file-url)))
-                               "")
-                          (section (form (@ (method POST)
-                                            (action "/sink-file")
-                                            (class "py-4"))
+                          (section ,(if new-url
+                                        `((p ,(format #f "new-url: ~a" new-url)))
+                                        "")
+                                   ,(if file-url
+                                        `((small ,(format #f "file-url: ~a"
+                                                          file-url))) ""))
+                          (section (@ (class ,(mk-class '(flex flex-row
+                                                               flex-wrap
+                                                               justify-center
+                                                               gap-8))))
 
-                                         (label (@ (for "file-url"))
-                                                "File URL:")
-                                         (input (@ (placeholder
-                                                    "Enter the file's URL here")
-                                                   (type url)
-                                                   (required "")
-                                                   (id file-url)
-                                                   (name file-url)) "")
-                                         (button (@ (type submit)) "Submit")))
+                                   (section (form (@ (method POST)
+                                                     (action "/sink-file")
+                                                     (class "py-4"))
+
+                                                  (label (@ (for "file-url"))
+                                                         "File URL:")
+                                                  (input (@ (placeholder
+                                                             "Enter the file's URL here")
+                                                            (type url)
+                                                            (required "")
+                                                            (id file-url)
+                                                            (name file-url))
+                                                         "")
+                                                  (button (@ (type submit))
+                                                          "Submit")))
+                                   (section (figure (img (@ (class ,(mk-class '
+                                                                              (w-24
+                                                                               h-auto
+                                                                               rounded-xl)))
+                                                            (src
+                                                             "https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png"))
+                                                         ""))))
                           (footer (@ (class "py-12 flex flex-row flex-wrap"))
                                   (small (em
                                           "find the source code for this program here:"))
@@ -69,17 +83,15 @@
                         #:key (title "torikomi") body)
   
   `("<!DOCTYPE html>" (html (head (title ,title)
-                                  (meta (@ (charset "UTF-8")) "")
-                                  (meta (@ (name viewport)
-                                           (content
-                                            "width=device-width, initial-scale=1.0"))
-                                        "")
                                   (style ,(assoc-ref asset-library
-                                                     "pub/css/style.css"))
+                                           "pub/css/torikomi.olive.min.css"))
+                                  ,(hygguile-recommended-meta)
+                                  ,(hygguile-recommended-resources)
                                   (link (@ (rel "shortcut icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")) "")
                                   (link (@ (rel "icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")) ""))
-                            (body ,body))))
+                            (body (div (@ (class ,(mk-class '(font-sans))))
+                                       ,body)))))

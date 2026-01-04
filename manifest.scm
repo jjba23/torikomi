@@ -94,6 +94,36 @@ of Guile Scheme, complementing it, and helping developers write cleaner,
 more efficient, and more powerful code.")
     (license license:lgpl3+)))
 
+(define-public guile-hygguile
+  (package
+    (name "guile-hygguile")
+    (version "2.0.20")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/hygguile.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1v6rp6zdrr457ix2zxgqd83vcdkyj8wcw48x020z3av6xh5b8vb0"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/hygguile")
+    (synopsis "Web UI component library for Guile Scheme projects")
+    (description
+     "Hygguile is a library that allows you to create cozy web user-interfaces
+using Guile Scheme, by defining an expressive domain-specific language (DSL),
+and by leveraging the power of S-expressions, SXML and TailwindCSS.
+
+The project aims to provide reusable, professional-looking and accessible
+web components, whose names resemble the HTML counterparts, thus
+easing the learning curve, and reducing the cognitive load.")
+    (license license:lgpl3+)))
+
 (packages->manifest (list (specification->package "make")
                           (specification->package "gettext")
                           guile-next
@@ -104,6 +134,7 @@ more efficient, and more powerful code.")
                           guile-curl
                           guile-gcrypt
                           nss-certs
+                          guile-hygguile
                           watchexec
                           emacs-no-x))
 

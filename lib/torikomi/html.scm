@@ -35,4 +35,4 @@
   #:export (asset-library))
 
 (define* asset-library
-  (build-asset-library '("pub/css/style.css")))
+  (build-asset-library '("pub/css/torikomi.olive.min.css")))
