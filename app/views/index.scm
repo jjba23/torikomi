@@ -28,53 +28,98 @@
   #:export (torikomi-page))
 
 (define (intro-section)
-  `((section (@ (class ,(mk-class '(py-4 px-2))))
-             (h1 (a (@ (class ,(mk-class '(overline text-lg font-bold)))
+  `((section (@ (class ,(mk-class '(py-6 md:py-8 px-3 md:px-6))))
+             (h1 (a (@ (class ,(mk-class '(overline text-lg font-bold
+                                           text-jeans-blue-700
+                                           dark:text-jeans-blue-100
+                                           hover:text-china-violet-300)))
                        (href "/")) "torikomi: 取り込み"))
-             (p (@ (class ,(mk-class '(py-4))))
+             (p (@ (class ,(mk-class '(py-4 text-onyx-500
+                                            dark:text-stone-500
+                                            font-light
+                                            max-w-72
+                                            text-justify
+                                            leading-6))))
               "simple interface to sink/download files from a remote URL directly into a directory on your server."))))
 
 (define* (url-show-section #:key file-url new-url)
   `((section ,(if new-url
-                  `((p ,(format #f "new-url: ~a" new-url))) "")
+                  `((p (@ (class ,(mk-class '(text-md text-onyx-500
+                                                      dark:text-stone-500))))
+                       ,(format #f "new-url: ~a" new-url))) "")
              ,(if file-url
-                  `((small ,(format #f "file-url: ~a" file-url))) ""))))
+                  `((small (@ (class ,(mk-class '(text-sm text-onyx-500
+                                                          dark:text-stone-500))))
+                           ,(format #f "file-url: ~a" file-url))) ""))))
 
 (define (footer-section)
   `((footer (@ (class ,(mk-class '(py-12 flex
-                                         flex-col
-                                         gap-3
+                                         flex-wrap
+                                         gap-8
                                          justify-center
                                          align-center
                                          items-center))))
-            (small (em (@ (class ,(mk-class '(italic text-sm))))
-                       "λ powered by Lisp (Guile Scheme)"))
-            (small (em (@ (class ,(mk-class '(text-sm))))
-                       "find the source code for this program here:"))
-            (a (@ (class ,(mk-class '(underline text-sm)))
-                  (href "https://codeberg.org/jjba23/torikomi"))
-               "codeberg.org/jjba23/torikomi"))))
+
+            (section ,(ui-mode-button #:size '(text-sm)
+                                      #:extra-classes '(py-1 px-2 max-w-prose
+                                                             cursor-pointer)))
+            (section (@ (class ,(mk-class '(flex flex-col gap-3 justify-center
+                                                 align-center items-center))))
+                     (small (em (@ (class ,(mk-class '(italic text-sm
+                                                       text-onyx-500
+                                                       dark:text-stone-500))))
+                                "λ powered by Lisp (Guile Scheme)"))
+                     (small (em (@ (class ,(mk-class '(text-md text-onyx-500
+                                                       dark:text-stone-500))))
+                                "find the source code for this program here:"))
+                     (a (@ (class ,(mk-class '(underline text-md
+                                               text-jeans-blue-700
+                                               dark:text-jeans-blue-100
+                                               hover:text-china-violet-300)))
+                           (href "https://codeberg.org/jjba23/torikomi"))
+                        "codeberg.org/jjba23/torikomi")))))
 
 (define (file-form-section)
-  `((section (@ (class ,(mk-class '(flex flex-row flex-wrap justify-between
-                                         gap-8))))
+  `((section (@ (class ,(mk-class '(flex flex-col-reverse
+                                         md:flex-row
+                                         flex-wrap
+                                         justify-center
+                                         items-center
+                                         align-center
+                                         md:justify-between
+                                         gap-8
+                                         px-6
+                                         md:px-16))))
 
              (section (form (@ (method POST)
                                (action "/sink-file")
                                (class ,(mk-class '(py-4))))
 
                             (label (@ (for "file-url")) "File URL:")
-                            (input (@ (placeholder "Enter the file's URL here")
-                                      (type url)
-                                      (required "")
-                                      (id file-url)
-                                      (name file-url)) "")
+                            ,(input #:placeholder "Enter the file's URL here"
+                                    #:type 'url
+                                    #:required #t
+                                    #:name 'file-url
+                                    #:input-css '(p-4 min-w-64
+                                                      md:min-w-128
+                                                      rounded-xl
+                                                      border-stone-700
+                                                      dark:border-onyx-100
+                                                      dark:text-stone-300
+                                                      bg-stone-300/75
+                                                      dark:bg-onyx-700/75
+                                                      border-2
+                                                      shadow-md
+                                                      font-sans))
                             (button (@ (type submit)) "Submit")))
-             (section (figure (img (@ (class ,(mk-class '(w-24 h-auto
-                                                               rounded-xl)))
-                                      (src
-                                       "https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png"))
-                                   ""))))))
+             ,(project-logo-section))))
+
+(define (project-logo-section)
+  `((section (figure (img (@ (class ,(mk-class '(w-24 h-auto rounded-xl
+                                                      shadow-lg)))
+                             (src
+                              "https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png"))
+                          "")))))
 
 (define* (torikomi-page G_
                         #:key file-url new-url)
@@ -100,5 +145,8 @@
                                   (link (@ (rel "icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")) ""))
-                            (body (div (@ (class ,(mk-class '(font-sans))))
+                            (body (@ (class ,(mk-class '(bg-stone-300
+                                                         dark:bg-onyx-900
+                                                         font-sans))))
+                                  (div (@ (class ,(mk-class '())))
                                        ,body)))))
