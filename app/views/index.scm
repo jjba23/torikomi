@@ -41,9 +41,16 @@
                   `((small ,(format #f "file-url: ~a" file-url))) ""))))
 
 (define (footer-section)
-  `((footer (@ (class ,(mk-class '(py-12 flex flex-col gap-3 justify-center align-center items-center))))
-                         (small (em (@(class ,(mk-class '(italic text-sm)))) "λ powered by Lisp (Guile Scheme)"))
-            (small (em (@(class ,(mk-class '(text-sm)))) "find the source code for this program here:"))
+  `((footer (@ (class ,(mk-class '(py-12 flex
+                                         flex-col
+                                         gap-3
+                                         justify-center
+                                         align-center
+                                         items-center))))
+            (small (em (@ (class ,(mk-class '(italic text-sm))))
+                       "λ powered by Lisp (Guile Scheme)"))
+            (small (em (@ (class ,(mk-class '(text-sm))))
+                       "find the source code for this program here:"))
             (a (@ (class ,(mk-class '(underline text-sm)))
                   (href "https://codeberg.org/jjba23/torikomi"))
                "codeberg.org/jjba23/torikomi"))))
