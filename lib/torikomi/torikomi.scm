@@ -16,109 +16,157 @@
 ;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (torikomi torikomi)
-  #:use-module (srfi srfi-1)
-  #:use-module (torikomi env)
-  #:use-module (web uri)
-  #:use-module (uuid generate)
-  #:use-module (web response)
-  #:use-module (rnrs bytevectors)
-  #:use-module (json)
-  #:use-module (curl)
-  #:use-module (ice-9 popen)
-  #:use-module (ice-9 textual-ports)
-  #:use-module (ice-9 time)
-  #:use-module (ice-9 format)
-  #:use-module (ice-9 string-fun)
-  #:use-module (ice-9 iconv)
-  #:use-module (ice-9 hash-table)
-  #:use-module (ice-9 threads)
-  #:use-module (kracht prelude)
-  #:use-module (srfi srfi-19)
-  #:use-module (ice-9 binary-ports)
+  #:use-module (srfi srfi-1) ;List processing (filter, etc.)
+  #:use-module (rnrs bytevectors) ;Bytevector handling
+  #:use-module (curl) ;Guile-curl bindings
+  #:use-module (uuid generate) ;UUID generation
+  #:use-module (ice-9 format) ;String formatting
+  #:use-module (ice-9 string-fun) ;String manipulation
+  #:use-module (ice-9 binary-ports) ;Binary IO
+  #:use-module (torikomi env) ;Environment variables 
   #:export (fetch-file))
 
-(define (assert-response-ok headers-and-bts)
-  (let* ((st (string-split (car headers-and-bts) #\space))
-         (num-status (string->number (cadr st))))
-    (when (or (>= num-status 300)
-              (< num-status 200))
-      (error (format #f "unexpected HTTP status code in response: ~a"
-                     num-status)))))
+;;; ----------------------------------------------------------------------------
+;;; Helper Functions
+;;; ----------------------------------------------------------------------------
 
-(define (find-content-type-in-headers raw-headers)
-  (let* ((headers (string-split (string-replace-substring raw-headers "\r\n"
-                                                          "\n") #\newline))
-         (maybe-content-type-line (filter (lambda (h)
-                                            (string-prefix-ci? "content-type:"
-                                             h)) headers)))
+(define (assert-response-ok status-line)
+  "Parses the HTTP status line and checks if the status code is 2xx.
+   Raises an error if the status is outside the 200-299 range."
+  ;; Example status line: "HTTP/1.1 200 OK"
+  (let* ((parts (string-split status-line #\space))
+         ;; The status code is typically the second element
+         (status-code (string->number (cadr parts))))
     
-    (if (eq? 1
-             (length maybe-content-type-line))
-        (let* ((full-line (car maybe-content-type-line))
-               (value-part (string-trim-both (cadr (string-split full-line #\:))))
-               (mime-only (string-trim-both (car (string-split value-part #\;))))
-               (parts (string-split mime-only #\/)))
-          (if (>= (length parts) 2)
-              (cadr parts) "bin")) "bin")))
+    (unless (and status-code
+                 (>= status-code 200)
+                 (< status-code 300))
+      (error (format #f "Error fetching URL. Unexpected HTTP status code: ~a"
+                     (or status-code "unknown"))))))
 
-(define* (mk-file-name #:key extension last-url-piece sink-file-directory
-                       file-content-type)
-  (let* ((new-uid (generate-string-uuid))
-         (name-with-ext (if (string-suffix-ci? extension last-url-piece)
-                            (format #f "~a" last-url-piece)
-                            (format #f "~a.~a" last-url-piece
-                                    file-content-type)))
-         (nn (string-join (drop-right (string-split name-with-ext #\.) 1) "."))
-         (ext (car (reverse (string-split name-with-ext #\.))))
-         (new-file-name (if (file-exists? (format #f "~a/~a"
-                                                  sink-file-directory
-                                                  name-with-ext))
-                            (format #f "~a-~a.~a" nn new-uid ext)
-                            (format #f "~a" name-with-ext))))
-    new-file-name))
+(define (parse-content-subtype header-value)
+  "Extracts the subtype from a Content-Type header value.
+   Input: 'image/jpeg; charset=utf-8' -> Output: 'jpeg'.
+   Defaults to 'bin' if parsing fails."
+  (let* ((mime-type (string-trim-both (car (string-split header-value #\;))))
+         (parts (string-split mime-type #\/)))
+    (if (>= (length parts) 2)
+        (cadr parts) ;Return subtype (e.g., "jpeg")
+        "bin")))
+ ;; Fallback
+
+(define (find-extension-in-headers raw-headers)
+  "Iterates through raw headers to find the Content-Type and derive a file extension.
+   Returns 'bin' if no specific type is found."
+  ;; Normalize newlines to handles \r\n vs \n consistency
+  (let* ((headers-str (string-replace-substring raw-headers "\r\n" "\n"))
+         (header-lines (string-split headers-str #\newline))
+         ;; Look for the line starting with "content-type:" (case insensitive)
+         (ct-line (find (lambda (line)
+                          (string-prefix-ci? "content-type:" line))
+                        header-lines)))
+    
+    (if ct-line
+        (let ((value-part (cadr (string-split ct-line #\:))))
+          (parse-content-subtype value-part)) "bin")))
+
+(define* (resolve-unique-filename #:key dir filename extension)
+  "Generates a file path. If the file already exists in 'dir', appends a UUID 
+   to ensure uniqueness.
+   
+   Args:
+     dir: Target directory path.
+     filename: Base name derived from URL.
+     extension: File extension (e.g., 'jpg')."
+  (let* ((basename (format #f "~a.~a" filename extension))
+         (full-path (format #f "~a/~a" dir basename)))
+    
+    (if (file-exists? full-path)
+        ;; Collision detected: inject UUID
+        (let* ((new-uid (generate-string-uuid))
+               (new-name (format #f "~a-~a.~a" filename new-uid extension)))
+          new-name)
+        ;; No collision: use original name
+        basename)))
+
+;;; ----------------------------------------------------------------------------
+;;; Main Export
+;;; ----------------------------------------------------------------------------
 
 (define* (fetch-file #:key url)
-  (display (format #f "\nfetching URL: ~a\n" url))
-  (let* ((sink-file-directory torikomi-sink-file-directory)
-         (sink-file-base-url torikomi-sink-file-base-url)
-         (last-url-piece (car (reverse (string-split url #\/))))
-         (handle (curl-easy-init))
-         (_ (begin
-              (curl-easy-setopt handle
-                                'header #f)
-              (curl-easy-setopt handle
-                                'url url)
-              (curl-easy-setopt handle
-                                'verbose #f)
-              (curl-easy-setopt handle
-                                'ssl-verifyhost #f)
-              (curl-easy-setopt handle
-                                'ssl-verifypeer #f)
-              (curl-easy-setopt handle
-                                'maxredirs 10)
-              (curl-easy-setopt handle
-                                'http-version 2)
-              (curl-easy-setopt handle
-                                'followlocation #t)
-              (curl-easy-setopt handle
-                                'timeout torikomi-curl-timeout-seconds)))
-         (headers-and-bts (curl-easy-perform handle #t #t))
-         (_ (assert-response-ok headers-and-bts))
-         (heads (car headers-and-bts))
-         (bts (cadr headers-and-bts))
-         (file-content-type (find-content-type-in-headers (car headers-and-bts)))
-         (extension (string-append "." file-content-type))
-         (new-file-name (mk-file-name #:extension extension
-                                      #:last-url-piece last-url-piece
-                                      #:file-content-type file-content-type
-                                      #:sink-file-directory
-                                      sink-file-directory))
-         (destination-file (format #f "~a/~a" sink-file-directory
-                                   new-file-name))
-         (new-url (format #f "~a/~a" sink-file-base-url new-file-name)))
-    (display (format #f "\nwriting file to ~a\n" destination-file))
-    (call-with-output-file destination-file
-      (lambda (port)
-        (put-bytevector port bts))
-      #:binary #t) new-url))
+  "Downloads a file from the given URL using libcurl.
+   
+   It automatically determines the file extension based on Content-Type headers,
+   handles file name collisions by appending a UUID, and saves the file to
+   'torikomi-sink-file-directory'.
+   
+   Returns: The public URL of the saved file."
+  (format #t "~%Fetching URL: ~a~%" url)
 
+  (let ((handle (curl-easy-init)))
+    (dynamic-wind
+     ;; 1. Setup (noop here as init is done in let)
+     (const #f)
+
+     ;; 2. Execution Body
+     (lambda ()
+       ;; Configure Curl Options
+       (curl-easy-setopt handle
+                         'header #f)
+       (curl-easy-setopt handle
+                         'url url)
+       (curl-easy-setopt handle
+                         'verbose #f)
+       (curl-easy-setopt handle
+                         'ssl-verifyhost #f) ;TODO make into variable
+       (curl-easy-setopt handle
+                         'ssl-verifypeer #f) ;TODO make into variable
+       (curl-easy-setopt handle
+                         'maxredirs 10) ;TODO make into variable
+       (curl-easy-setopt handle
+                         'http-version 2)
+       (curl-easy-setopt handle
+                         'followlocation #t)
+       (curl-easy-setopt handle
+                         'timeout torikomi-curl-timeout-seconds)
+
+       ;; Perform Request
+       (let* ((response (curl-easy-perform handle #t #t))
+              (headers (car response))
+              (body (cadr response)))
+         
+         ;; Validate Response
+         (assert-response-ok headers)
+
+         (let* ((lili (last (string-split url #\/)))
+                (last-url-piece (if (equal? "" lili) "torikomi" lili))
+                ;; Extract extension from headers (e.g., "png")
+                (ext-from-headers (find-extension-in-headers headers))
+                ;; Clean the filename (remove existing extension if present in URL piece to avoid img.jpg.jpg)
+                (clean-name (first (string-split last-url-piece #\.)))
+
+                ;; Generate unique filename
+                (final-filename (resolve-unique-filename #:dir
+                                 torikomi-sink-file-directory
+                                 #:filename clean-name
+                                 #:extension ext-from-headers))
+
+                (dest-path (format #f "~a/~a" torikomi-sink-file-directory
+                                   final-filename))
+                (public-url (format #f "~a/~a" torikomi-sink-file-base-url
+                                    final-filename)))
+           
+           (format #t "Writing file to: ~a~%" dest-path)
+
+           ;; Write to disk
+           (call-with-output-file dest-path
+             (lambda (port)
+               (put-bytevector port body))
+             #:binary #t)
+
+           ;; Return the public URL
+           public-url)))
+
+     ;; 3. Cleanup (Guarantees handle is freed even on error)
+     (lambda ()
+       (curl-easy-cleanup handle)))))

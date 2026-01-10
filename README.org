@@ -18,9 +18,10 @@ It provides a simple interface—both via a web form and a REST API—to *"sink"
 
 [[https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-tiny.png]]
 
+Choose a name/Automated naming: user-input or extract file name and file type from URLs using basename.
+  
 - Supports traditional HTML forms and modern JSON REST endpoints.
 - Minimalist Core: Built on the powerful Guile Scheme language.
-- Automated Naming: Automatically extracts filenames from URLs using basename.
 - Built using the Lisp powered UI combo ([[https://codeberg.org/jjba23/hygguile][Hygguile]] and [[https://codeberg.org/jjba23/olive-css][Olive CSS]])
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
