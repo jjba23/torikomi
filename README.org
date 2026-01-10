@@ -10,8 +10,6 @@
 [[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] 
 [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 
-🚧 Work in progress!
-
 Torikomi (取り込み): Meaning "ingest," "capture," or "import."  in Japanese.
 
 torikomi is a minimalist web service built with GNU Artanis and Guile Scheme.
