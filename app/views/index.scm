@@ -29,11 +29,11 @@
 
 (define (intro-section)
   `((section (@ (class ,(mk-class '(py-6 md:py-8 px-3 md:px-6))))
-             (h1 (a (@ (class ,(mk-class '(overline text-lg font-bold
+             ,(h1 `((a (@ (class ,(mk-class '(overline  font-bold
                                            text-jeans-blue-700
                                            dark:text-jeans-blue-100
                                            hover:text-china-violet-300)))
-                       (href "/")) "torikomi: 取り込み"))
+                       (href "/")) "torikomi: 取り込み")))
              (p (@ (class ,(mk-class '(py-4 text-onyx-500
                                             dark:text-stone-500
                                             font-light
@@ -54,7 +54,7 @@
                            ,(format #f "given file-url: ~a" file-url))) ""))))
 
 (define (footer-section)
-  `((footer (@ (class ,(mk-class '(py-12 flex
+  `((footer (@ (class ,(mk-class '(pb-8 pt-24 md:pt-36 flex
                                          flex-wrap
                                          gap-8
                                          justify-center
@@ -81,16 +81,16 @@
                         "codeberg.org/jjba23/torikomi")))))
 
 (define (file-form-section)
-  `((section (@ (class ,(mk-class '(flex flex-col-reverse
-                                         md:flex-row
+  `((section (@ (class ,(mk-class '(flex 
+                                         flex-row
                                          flex-wrap
                                          justify-center
                                          items-center
                                          align-center
-                                         md:justify-between
                                          gap-8
                                          px-6
-                                         md:px-16))))
+                                         md:px-16
+                                         ))))
 
              (section (form (@ (method POST)
                                (action "/sink-file")
@@ -112,7 +112,8 @@
                                                       border-2
                                                       shadow-md
                                                       font-sans))
-                            ,(submit-button "download")))
+                            ,(icon-button #:icon 'download #:content "download" #:type 'submit
+                                          #:background '(bg-asparagus-500/90 dark:bg-asparagus-500/90))))
              ,(project-logo-section))))
 
 (define (project-logo-section)
