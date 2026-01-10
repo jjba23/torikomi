@@ -37,6 +37,14 @@
   #:use-module (ice-9 binary-ports)
   #:export (fetch-file))
 
+(define (assert-response-ok headers-and-bts)
+  (let* ((st (string-split (car headers-and-bts) #\space))
+         (num-status (string->number (cadr st))))
+    (when (or (>= num-status 300)
+              (< num-status 200))
+      (error (format #f "unexpected HTTP status code in response: ~a"
+                     num-status)))))
+
 (define (find-content-type-in-headers raw-headers)
   (let* ((headers (string-split (string-replace-substring raw-headers "\r\n"
                                                           "\n") #\newline))
@@ -53,12 +61,13 @@
           (if (>= (length parts) 2)
               (cadr parts) "bin")) "bin")))
 
-(define* (mk-file-name #:key extension last-url-piece sink-file-directory)
+(define* (mk-file-name #:key extension last-url-piece sink-file-directory
+                       file-content-type)
   (let* ((new-uid (generate-string-uuid))
          (name-with-ext (if (string-suffix-ci? extension last-url-piece)
                             (format #f "~a" last-url-piece)
                             (format #f "~a.~a" last-url-piece
-                                    response-content-type)))
+                                    file-content-type)))
          (nn (string-join (drop-right (string-split name-with-ext #\.) 1) "."))
          (ext (car (reverse (string-split name-with-ext #\.))))
          (new-file-name (if (file-exists? (format #f "~a/~a"
@@ -94,13 +103,14 @@
               (curl-easy-setopt handle
                                 'timeout torikomi-curl-timeout-seconds)))
          (headers-and-bts (curl-easy-perform handle #t #t))
+         (_ (assert-response-ok headers-and-bts))
          (heads (car headers-and-bts))
          (bts (cadr headers-and-bts))
-         (response-content-type (find-content-type-in-headers (car
-                                                               headers-and-bts)))
-         (extension (string-append "." response-content-type))
+         (file-content-type (find-content-type-in-headers (car headers-and-bts)))
+         (extension (string-append "." file-content-type))
          (new-file-name (mk-file-name #:extension extension
                                       #:last-url-piece last-url-piece
+                                      #:file-content-type file-content-type
                                       #:sink-file-directory
                                       sink-file-directory))
          (destination-file (format #f "~a/~a" sink-file-directory
