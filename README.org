@@ -23,7 +23,7 @@ Automated naming: torikomi reads response headers and bytes, and will extract fi
 - Supports traditional HTML forms and modern JSON REST endpoints.
 - Minimalist Core: Built on the powerful Guile Scheme language.
 - Built using the Lisp powered UI combo ([[https://codeberg.org/jjba23/hygguile][Hygguile]] and [[https://codeberg.org/jjba23/olive-css][Olive CSS]])
- TODO: Let user choose file name and file conflict strategy?
+- TODO: Let user choose file name and file conflict strategy?
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
