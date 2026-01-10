@@ -139,7 +139,8 @@
                 (last-url-piece (if (equal? "" lili) "torikomi" lili))
                 ;; Extract extension from headers (e.g., "png")
                 (ext-from-headers (find-extension-in-headers headers))
-                ;; Clean the filename (remove existing extension if present in URL piece to avoid img.jpg.jpg)
+                ;; Clean the filename
+                ;; also (remove existing extension if present in URL piece to avoid img.jpg.jpg)
                 (clean-name (first (string-split last-url-piece #\.)))
 
                 ;; Generate unique filename
