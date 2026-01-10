@@ -53,6 +53,21 @@
           (if (>= (length parts) 2)
               (cadr parts) "bin")) "bin")))
 
+(define* (mk-file-name #:key extension last-url-piece sink-file-directory)
+  (let* ((new-uid (generate-string-uuid))
+         (name-with-ext (if (string-suffix-ci? extension last-url-piece)
+                            (format #f "~a" last-url-piece)
+                            (format #f "~a.~a" last-url-piece
+                                    response-content-type)))
+         (nn (string-join (drop-right (string-split name-with-ext #\.) 1) "."))
+         (ext (car (reverse (string-split name-with-ext #\.))))
+         (new-file-name (if (file-exists? (format #f "~a/~a"
+                                                  sink-file-directory
+                                                  name-with-ext))
+                            (format #f "~a-~a.~a" nn new-uid ext)
+                            (format #f "~a" name-with-ext))))
+    new-file-name))
+
 (define* (fetch-file #:key url)
   (display (format #f "\nfetching URL: ~a\n" url))
   (let* ((sink-file-directory torikomi-sink-file-directory)
@@ -84,20 +99,10 @@
          (response-content-type (find-content-type-in-headers (car
                                                                headers-and-bts)))
          (extension (string-append "." response-content-type))
-         (new-uid (generate-string-uuid))
-         (new-file-name (let* ((n (if (string-suffix-ci? extension
-                                                         last-url-piece)
-                                      (format #f "~a" last-url-piece)
-                                      (format #f "~a.~a" last-url-piece
-                                              response-content-type)))
-                               (nn (string-join (drop-right (string-split n
-                                                                          #\.)
-                                                            1) "."))
-                               (ext (car (reverse (string-split n #\.)))))
-                          (if (file-exists? (format #f "~a/~a"
-                                                    sink-file-directory n))
-                              (format #f "~a-~a.~a" nn new-uid ext)
-                              (format #f "~a" n))))
+         (new-file-name (mk-file-name #:extension extension
+                                      #:last-url-piece last-url-piece
+                                      #:sink-file-directory
+                                      sink-file-directory))
          (destination-file (format #f "~a/~a" sink-file-directory
                                    new-file-name))
          (new-url (format #f "~a/~a" sink-file-base-url new-file-name)))
