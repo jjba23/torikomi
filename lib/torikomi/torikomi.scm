@@ -105,10 +105,7 @@
 
   (let ((handle (curl-easy-init)))
     (dynamic-wind
-     ;; 1. Setup (noop here as init is done in let)
      (const #f)
-
-     ;; 2. Execution Body
      (lambda ()
        ;; Configure Curl Options
        (curl-easy-setopt handle
