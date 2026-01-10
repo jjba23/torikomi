@@ -16,13 +16,14 @@ torikomi is a minimalist web service built with GNU Artanis and Guile Scheme.
 
 It provides a simple interface—both via a web form and a REST API—to *"sink" (download) files from a remote URL directly into a local directory* on your server.
 
-[[https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-tiny.png]]
+Automated naming: torikomi reads response headers and bytes, and will extract file name and file type from URLs you want and download those files and name them properly.
 
-Choose a name/Automated naming: user-input or extract file name and file type from URLs using basename.
+[[https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-tiny.png]]
   
 - Supports traditional HTML forms and modern JSON REST endpoints.
 - Minimalist Core: Built on the powerful Guile Scheme language.
 - Built using the Lisp powered UI combo ([[https://codeberg.org/jjba23/hygguile][Hygguile]] and [[https://codeberg.org/jjba23/olive-css][Olive CSS]])
+ TODO: Let user choose file name and file conflict strategy?
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
