@@ -79,7 +79,6 @@
   ($ '("http POST localhost:50027/api/v1/sink-file"
        "file-url=https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png")))
 
-
 (define (olive-css)
   ($ '("curl --output \"./pub/css/torikomi.olive.min.css\""
        "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/torikomi.olive.min.css\"")))
