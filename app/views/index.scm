@@ -156,6 +156,9 @@
                                   (link (@ (rel "icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")) ""))
+                              (link (@ (rel stylesheet)
+                                       (href "/css/torikomi.olive.min.css"))
+                                    "")                            
                             (body (@ (class ,(mk-class '(bg-stone-300
                                                          dark:bg-onyx-900
                                                          font-sans))))
