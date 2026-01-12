@@ -31,6 +31,8 @@ Since torikomi is built to create multimedia archives, when conflicting between 
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
+[[https://jointhefreeworld.org/static-assets/torikomi/screen-2026-01-12-23-25-46.png]]
+
 The most important endpoints:
 
 ~GET /~ is the homepage, ~POST /sink-file~ is the form endpoint to submit files to sink, ~POST /api/v1/sink-file~ is the REST API endpoint to submit files to sink
