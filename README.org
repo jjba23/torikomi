@@ -16,7 +16,9 @@ torikomi is a minimalist web service built with GNU Artanis and Guile Scheme.
 
 It provides a simple interface—both via a web form and a REST API—to *"sink" (download) files from a remote URL directly into a local directory* on your server.
 
-Automated naming: torikomi reads response headers and bytes, and will extract file name and file type from URLs you want and download those files and name them properly.
+You can simply give the filename that you want, or use the automated naming: torikomi reads response headers and bytes, and will extract file name and file type from URLs you want and download those files and name them properly.
+
+Since torikomi is built to create multimedia archives, when conflicting between files (more than 1 of same name) torikomi saves a copy with a different name.
 
 [[https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-tiny.png]]
   
