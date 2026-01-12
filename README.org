@@ -12,7 +12,7 @@
 
 Torikomi (取り込み): Meaning "ingest," "capture," or "import."  in Japanese.
 
-torikomi is a minimalist web service built with GNU Artanis and Guile Scheme.
+torikomi is a minimalist web service built with GNU Artanis and Guile Scheme for archiving and building collections and libraries of files.
 
 It provides a simple interface—both via a web form and a REST API—to *"sink" (download) files from a remote URL directly into a local directory* on your server. 
 
