@@ -141,7 +141,7 @@
                 (ext-from-headers (find-extension-in-headers headers))
                 ;; Clean the filename
                 ;; also (remove existing extension if present in URL piece to avoid img.jpg.jpg)
-                (clean-name (if (not name)
+                (clean-name (if (or (not name) (equal? "" name))
                                 (first (string-split last-url-piece #\.))
                                 name))
 
