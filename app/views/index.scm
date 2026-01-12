@@ -23,7 +23,6 @@
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:use-module (torikomi html)
   #:use-module (hygguile hygguile)
   #:export (torikomi-page))
 
@@ -86,7 +85,14 @@
                                                dark:text-jeans-blue-100
                                                hover:text-china-violet-300)))
                            (href "https://codeberg.org/jjba23/torikomi"))
-                        "codeberg.org/jjba23/torikomi")))))
+                        "codeberg.org/jjba23/torikomi"))
+            (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                             align-center items-center))))
+                 ,(em "version:")
+                 ,(mono (format #f "~a"
+                                (get-short-commit-sha))
+                        #:size '(text-md)
+                        #:weight '(font-light))))))
 
 (define (file-form-section)
   `((section (@ (class ,(mk-class '(flex flex-row
@@ -156,9 +162,8 @@
                                   (link (@ (rel "icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")) ""))
-                              (link (@ (rel stylesheet)
-                                       (href "/css/torikomi.olive.min.css"))
-                                    "")                            
+                            (link (@ (rel stylesheet)
+                                     (href "/css/torikomi.olive.min.css")) "")
                             (body (@ (class ,(mk-class '(bg-stone-300
                                                          dark:bg-onyx-900
                                                          font-sans))))
