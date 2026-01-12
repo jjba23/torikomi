@@ -41,7 +41,7 @@
                                             leading-6))))
               "simple interface to sink/download files from a remote URL directly into a directory on your server."))))
 
-(define* (url-show-section #:key file-url new-url)
+(define* (url-show-section #:key file-url file-name new-url)
   `((section (@ (class ,(mk-class '(px-6 md:px-16 py-4 flex flex-col gap-3))))
              ,(if new-url
                   `((p (@ (class ,(mk-class '(text-md text-onyx-500
