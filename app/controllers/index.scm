@@ -39,11 +39,13 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-               (new-url (fetch-file #:url (assoc-ref body "file-url"))))
+               (new-url (fetch-file #:url (assoc-ref body "file-url")
+                                    #:name (assoc-ref body "file-name"))))
           (response-emit (:mime rc
                                 (torikomi-page (:i18n rc)
                                                #:file-url (assoc-ref body
                                                            "file-url")
+                                               #:file-name (assoc-ref body "file-name")
                                                #:new-url new-url))))))
 
 (get "/robots.txt" static-page-emitter)

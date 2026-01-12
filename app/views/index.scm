@@ -53,6 +53,10 @@
                        (span "new url:")
                        ,(a new-url)))
                   `())
+             ,(if file-name
+                  `((small (@ (class ,(mk-class '(pt-4 text-sm text-onyx-300
+                                                       dark:text-stone-900))))
+                           ,(format #f "given file-name: ~a" file-name))) "")             
              ,(if file-url
                   `((small (@ (class ,(mk-class '(pt-4 text-sm text-onyx-300
                                                        dark:text-stone-900))))
@@ -108,7 +112,7 @@
                                (action "/sink-file")
                                (class ,(mk-class '(py-4))))
 
-                            ,(input #:label "File URL:"
+                            ,(input #:label "File URL (required):"
                                     #:placeholder "Enter the file's URL here"
                                     #:type 'url
                                     #:required #t
@@ -124,11 +128,30 @@
                                                       border-2
                                                       shadow-md
                                                       font-sans))
-                            ,(icon-button #:icon 'download
-                                          #:content "download"
-                                          #:type 'submit
-                                          #:background '(bg-asparagus-500/90
-                                                         dark:bg-asparagus-500/90))))
+
+                            ,(input #:label "File name (optional):"
+                              #:placeholder
+                              "Enter the file's name to save the file as"
+                              #:type 'url
+                              #:required #f
+                              #:name 'file-name
+                              #:input-css '(p-4 min-w-64
+                                                md:min-w-128
+                                                rounded-xl
+                                                border-stone-700
+                                                dark:border-onyx-100
+                                                dark:text-stone-300
+                                                bg-stone-300/75
+                                                dark:bg-onyx-700/75
+                                                border-2
+                                                shadow-md
+                                                font-sans))
+                            (div (@ (class ,(mk-class '(pt-2))))
+                                 ,(icon-button #:icon 'download
+                                               #:content "download"
+                                               #:type 'submit
+                                               #:background '(bg-asparagus-500/90
+                                                              dark:bg-asparagus-500/90)))))
              ,(project-logo-section))))
 
 (define (project-logo-section)
@@ -139,10 +162,12 @@
                           "")))))
 
 (define* (torikomi-page G_
-                        #:key file-url new-url)
+                        #:key file-url file-name new-url)
   (html-template G_
                  #:body `(,(intro-section) ,(url-show-section #:file-url
                                                               file-url
+                                                              #:file-name
+                                                              file-name
                                                               #:new-url
                                                               new-url)
                           ,(file-form-section)

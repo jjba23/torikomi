@@ -93,7 +93,7 @@
 ;;; Main Export
 ;;; ----------------------------------------------------------------------------
 
-(define* (fetch-file #:key url)
+(define* (fetch-file #:key url name)
   "Downloads a file from the given URL using libcurl.
    
    It automatically determines the file extension based on Content-Type headers,
@@ -141,7 +141,9 @@
                 (ext-from-headers (find-extension-in-headers headers))
                 ;; Clean the filename
                 ;; also (remove existing extension if present in URL piece to avoid img.jpg.jpg)
-                (clean-name (first (string-split last-url-piece #\.)))
+                (clean-name (if (not name)
+                                (first (string-split last-url-piece #\.))
+                                name))
 
                 ;; Generate unique filename
                 (final-filename (resolve-unique-filename #:dir
