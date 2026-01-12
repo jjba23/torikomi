@@ -152,8 +152,6 @@
                         #:key (title "torikomi") body)
   
   `("<!DOCTYPE html>" (html (head (title ,title)
-                                  (style ,(assoc-ref asset-library
-                                           "pub/css/torikomi.olive.min.css"))
                                   ,(hygguile-recommended-meta)
                                   ,(hygguile-recommended-resources)
                                   (link (@ (rel "shortcut icon")
