@@ -132,7 +132,7 @@
                             ,(input #:label "File name (optional):"
                               #:placeholder
                               "Enter the file's name to save the file as"
-                              #:type 'url
+                              #:type 'text
                               #:required #f
                               #:name 'file-name
                               #:input-css '(p-4 min-w-64
