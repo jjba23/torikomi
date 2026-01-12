@@ -14,7 +14,7 @@ Torikomi (取り込み): Meaning "ingest," "capture," or "import."  in Japanese.
 
 torikomi is a minimalist web service built with GNU Artanis and Guile Scheme.
 
-It provides a simple interface—both via a web form and a REST API—to *"sink" (download) files from a remote URL directly into a local directory* on your server.
+It provides a simple interface—both via a web form and a REST API—to *"sink" (download) files from a remote URL directly into a local directory* on your server. 
 
 You can simply give the filename that you want, or use the automated naming: torikomi reads response headers and bytes, and will extract file name and file type from URLs you want and download those files and name them properly.
 
@@ -25,13 +25,20 @@ Since torikomi is built to create multimedia archives, when conflicting between 
 - Supports traditional HTML forms and modern JSON REST endpoints.
 - Minimalist Core: Built on the powerful Guile Scheme language.
 - Built using the Lisp powered UI combo ([[https://codeberg.org/jjba23/hygguile][Hygguile]] and [[https://codeberg.org/jjba23/olive-css][Olive CSS]])
-- TODO: Let user choose file name and file conflict strategy?
+- TODO: Let user choose file conflict strategy?
+- TODO: Let user choose auto-conversion to AVIF or WEBP or others
+- TODO: Let user create auto tar-ball or zip
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
 The most important endpoints:
 
 ~GET /~ is the homepage, ~POST /sink-file~ is the form endpoint to submit files to sink, ~POST /api/v1/sink-file~ is the REST API endpoint to submit files to sink
+
+It might happen sometimes that some pages return 401 or 404 HTTP status codes and thus the download will fail.
+It is also possible that DNS resolution was not successful for a URL from within the server, check with your server administrator for more settings.
+
+I mainly use torikomi to create image or file archives, for example, for [[https://wikimusic.jointhefreeworld.org][wikimusic]], see my library at [[https://visus-aeternus.jointhefreeworld.org]]
 
 A ~env.scm~ file is expected at the root of the project. Important variables:
 
@@ -69,3 +76,4 @@ https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-con
 In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
 
 -------
+
