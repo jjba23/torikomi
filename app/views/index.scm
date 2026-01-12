@@ -49,14 +49,21 @@
                                                       flex
                                                       flex-wrap
                                                       flex-row
+                                                      items-center
+                                                      align-center
                                                       gap-3))))
                        (span "new url:")
-                       ,(a new-url)))
+                       ,(a new-url)
+                       ,(icon-button #:content "copy"
+                                     #:icon 'clipboard
+                                     #:on-click (format #f
+                                                 "navigator.clipboard.writeText('~a')"
+                                                 new-url))))
                   `())
              ,(if file-name
                   `((small (@ (class ,(mk-class '(pt-4 text-sm text-onyx-300
                                                        dark:text-stone-900))))
-                           ,(format #f "given file-name: ~a" file-name))) "")             
+                           ,(format #f "given file-name: ~a" file-name))) "")
              ,(if file-url
                   `((small (@ (class ,(mk-class '(pt-4 text-sm text-onyx-300
                                                        dark:text-stone-900))))
