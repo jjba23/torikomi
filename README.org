@@ -1,5 +1,3 @@
-improve this doc:
-
 #+title: torikomi
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
