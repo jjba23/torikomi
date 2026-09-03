@@ -1,4 +1,4 @@
-;;; torikomi 
+;;; torikomi
 
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
@@ -97,7 +97,7 @@ more efficient, and more powerful code.")
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "2.0.20")
+    (version "2.2.0")
     (source
      (origin
        (method git-fetch)
@@ -106,7 +106,7 @@ more efficient, and more powerful code.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1v6rp6zdrr457ix2zxgqd83vcdkyj8wcw48x020z3av6xh5b8vb0"))))
+        (base32 "1xvcmz7mg3pc58nivak2y4myfvxnqc3d7snrwj2nzhh42nm1j200"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -137,4 +137,3 @@ easing the learning curve, and reducing the cognitive load.")
                           guile-hygguile
                           watchexec
                           emacs-no-x))
-
