@@ -12,6 +12,9 @@
 (init-server #:statics '(png gif
                              jpg
                              jpeg
+                             webp
+                             avif
+                             svg
                              ico
                              html
                              js
@@ -19,15 +22,24 @@
                              csv
                              xml
                              css
+                             pdf
+                             mp3
+                             mp4
                              woff
                              woff2
                              ttf))
 (add-to-load-path (string-append (current-toplevel) "/lib"))
 ;; Put whatever you want to be called before server running here
 
-(catch #t
-  (lambda()
-    (display "\nloading env.scm\n")
-    (load "env.scm"))
-  (lambda(key . args)
-    (display (format #f "error loading env.scm: ~a: ~a" key args))))
+;; The deployment's own settings file is optional.  Everything torikomi needs to
+;; know now has a default in `(torikomi preferences)', read from the
+;; environment, so a fresh clone starts without any file at all.  `env.scm' is
+;; still honoured for a deployment that predates that; it is only looked for,
+;; and only loaded, when it is there -- which is what keeps a checkout without
+;; one from printing a failure on every start.
+(when (file-exists? "env.scm")
+  (display "\nloading env.scm\n")
+  (catch #t
+    (lambda () (load "env.scm"))
+    (lambda (key . args)
+      (display (format #f "error loading env.scm: ~a: ~a" key args)))))

@@ -15,31 +15,45 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
+;;; The development environment, pinned the way the project's sibling
+;;; (~/Hacking/byggsteg) pins its own: the Scheme libraries are defined here,
+;;; at the versions this tree is known to build and run against, so that a
+;;; checkout is reproducible on any machine and the CI job that runs `maak test'
+;;; tests the same code everywhere.
+;;;
+;;; The command-line tools are not an afterthought: `maak' drives `find',
+;;; `fuser', `mkdir', `curl' and `guile' itself, so they are named here rather
+;;; than borrowed from whatever the developer's profile happens to hold.
+
 (use-modules (guix packages)
              (gnu)
              (guix utils)
              (guix git-download)
              (guix download)
              (guix build-system gnu)
-             (gnu packages guile)
-             (gnu packages curl)
+             (guix build-system guile)
+             (gnu packages admin)
+             (gnu packages autotools)
+             (gnu packages base)
              (gnu packages bash)
-             (gnu packages nss)
+             (gnu packages compression)
+             (gnu packages curl)
+             (gnu packages emacs)
              (gnu packages gnupg)
+             (gnu packages guile)
              (gnu packages guile-xyz)
+             (gnu packages linux)
+             (gnu packages nss)
+             (gnu packages perl)
              (gnu packages pkg-config)
              (gnu packages rust-apps)
-             (guix build-system guile)
-             (gnu packages linux)
-             (gnu packages emacs)
-             (gnu packages vim)
-             (gnu packages tls)
-             (gnu packages perl)
-             (gnu packages compression)
              (gnu packages texinfo)
-             (gnu packages autotools)
+             (gnu packages tls)
+             (gnu packages vim)
              ((guix licenses)
               #:prefix license:))
+
+;;; ====== The Scheme libraries ======
 
 (define-public guile-uuid
   (package
@@ -65,10 +79,13 @@ standard hex-and-dash format of any variant and version. Simple routines for con
 between binary and hex-and-dash string UUIDs are included.")
     (license license:gpl3+)))
 
+;;; Kracht is what `(kracht prelude)' brings the controllers and views: the
+;;; little conveniences the project writes in, kept in one place rather than
+;;; copied between files.
 (define-public guile-kracht
   (package
     (name "guile-kracht")
-    (version "0.2.1")
+    (version "0.3.0")
     (source
      (origin
        (method git-fetch)
@@ -77,7 +94,7 @@ between binary and hex-and-dash string UUIDs are included.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mcyi3a6vpqm4z01rcmv6fqhf7gayppa9yib76jqrihxv8w70m5g"))))
+        (base32 "0ayazqxg5rcvfpabfican1a2mzix63nklj06ksdb34zlbbiqzcjr"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -85,19 +102,18 @@ between binary and hex-and-dash string UUIDs are included.")
       #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/kracht")
     (synopsis
-     "Utility methods and functionalities for Guile Scheme programming")
+     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
     (description
-     "Kracht provides helpful and convenient functionalities that can help you
-develop more comfortably in your Guile Scheme project. You can see it as a
-batteries-included addition to the (already great) standard library
-of Guile Scheme, complementing it, and helping developers write cleaner,
-more efficient, and more powerful code.")
+     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
     (license license:lgpl3+)))
 
+;;; Hygguile is the component library the page is built from.  It is pinned
+;;; here rather than taken from the channel so that the markup a deployment
+;;; serves and the markup a test reads are the same markup.
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "2.2.0")
+    (version "2.5.0")
     (source
      (origin
        (method git-fetch)
@@ -106,9 +122,13 @@ more efficient, and more powerful code.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1xvcmz7mg3pc58nivak2y4myfvxnqc3d7snrwj2nzhh42nm1j200"))))
+        (base32 "1vdqzxs2n97iqk53p0an3fzxrghh12q14v3ahm84yf7pcyyyny2d"))))
     (build-system guile-build-system)
-    (native-inputs (list guile-3.0))
+    ;; guile-uuid pulls in guile-gcrypt at compile time: the UUID module opens
+    ;; `(gcrypt random)' and `(gcrypt hash)' while it is being compiled, so the
+    ;; crypt library has to be in the build environment and not only in the
+    ;; profile a deployment runs.
+    (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
     (arguments
      (list
       #:source-directory "src"))
@@ -124,16 +144,72 @@ web components, whose names resemble the HTML counterparts, thus
 easing the learning curve, and reducing the cognitive load.")
     (license license:lgpl3+)))
 
-(packages->manifest (list (specification->package "make")
-                          (specification->package "gettext")
-                          guile-next
-                          guile-uuid
-                          guile-ares-rs
-                          artanis
-                          guile-kracht
-                          guile-curl
-                          guile-gcrypt
-                          nss-certs
-                          guile-hygguile
-                          watchexec
-                          emacs-no-x))
+;;; Veritas is the test framework `maak test' runs.  Specs are discovered under
+;;; test/veritas/unit and their suites are named `(veritas unit ...)', so the
+;;; library is part of the development environment as much as it is a run-time
+;;; dependency of the test task.
+(define-public guile-veritas
+  (package
+    (name "guile-veritas")
+    (version "0.8.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/veritas.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1cpc4cnm5aac8528s8b5wslcbxq0kdf7ya9y5rm6alv1h154pj47"))))
+    (build-system guile-build-system)
+    (arguments
+     (list
+      #:source-directory "src"))
+    (native-inputs (list guile-3.0))
+    (propagated-inputs (list guile-fibers guile-json-4))
+    (home-page "https://codeberg.org/jjba23/veritas")
+    (synopsis "Testing framework for Guile")
+    (description
+     "Veritas is a testing framework for Guile with an @acronym{EDSL,
+embedded domain specific language} to define test suites.  Emphasis is placed
+on legible, maintainable tests.  Veritas shuffles tests and runs them
+concurrently by default.")
+    (license license:lgpl3+)))
+
+;;; ====== The environment ======
+
+(packages->manifest
+ (list
+  ;; The build and release tooling.
+  (specification->package "make")
+  (specification->package "gettext")
+
+  ;; Guile and the libraries the source imports.
+  guile-3.0-latest
+  guile-uuid
+  guile-ares-rs
+  artanis
+  guile-kracht
+  guile-curl
+  guile-gcrypt
+  guile-hygguile
+  guile-veritas
+
+  ;; TLS trust anchors.  guile-curl asks libcurl to verify the peer and the
+  ;; host by default (see `(torikomi preferences)'), which needs a bundle of
+  ;; certificates in the environment; a deployment that only reads http still
+  ;; gets the bundle, because the same server usually serves both.
+  nss-certs
+
+  ;; The command-line tools `maak' drives: `find' for fmt, `fuser' for
+  ;; kill-server, `mkdir'/`rm' for the sink directory, `curl' for the
+  ;; stylesheet, and bash to run all of it.
+  coreutils
+  findutils
+  psmisc
+  curl
+  bash-minimal
+
+  ;; Watching the tree while developing, and the editor `maak fmt' documents.
+  watchexec
+  emacs-no-x))

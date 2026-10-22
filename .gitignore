@@ -6,3 +6,4 @@ env.scm
 .nrepl-port
 tmp/
 pub/tmp/
+reports/
