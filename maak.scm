@@ -56,12 +56,13 @@
 
 (define (default)
   "Default task to be run, list available tasks."
-  ($ '("maak --list")))
+  (list-tasks))
 
 (define (fmt)
   "Format Scheme source code files according to the Guix style guide."
-  ($ '("find . -maxdepth 8 -name '*.scm'"
-       "-type f -exec guix style -f {} \\;")))
+  (run (list "find" "." "-maxdepth" "8" "-name" "*.scm" "-type" "f"
+             "-exec" "guix" "style" "-f" "{}" ";")
+       #:verbose? #t))
 
 (define (hot-reload)
   "Hot-reloading developer's setup."
@@ -91,7 +92,7 @@ The short wait afterwards is not politeness: a server that has been signalled
 has not necessarily released the port by the time the next one binds it, and
 the second bind then fails with an address already in use."
   ($ (list (~ "fuser -k ~a/tcp || true" http-port)))
-  ($ '("sleep 1")))
+  (run (list "sleep" "1")))
 
 (define (server)
   "Target to start the torikomi server with the default configuration."
