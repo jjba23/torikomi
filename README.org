@@ -20,7 +20,7 @@ You can simply give the filename that you want, or use the automated naming: tor
 
 Since torikomi is built to create multimedia archives, when conflicting between files (more than 1 of same name) torikomi saves a copy with a different name.
 
-This is torikomi version 0.1.0.  ~maak version~ prints it, and ~maak sync-version~ keeps the copies in this manual in step with ~lib/torikomi/version.scm~.
+This is torikomi version 0.1.1.  ~maak version~ prints it, and ~maak sync-version~ keeps the copies in this manual in step with ~lib/torikomi/version.scm~.
 
 [[https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-tiny.png]]
 

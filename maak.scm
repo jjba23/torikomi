@@ -18,10 +18,9 @@
 (define-module (maak)
   #:use-module (maak maak)
   ;; What the release tasks read the tree with: a file that carries a copy of
-  ;; the version is rewritten through a regular expression, and `get-string-all'
-  ;; is how a file is read whole.  The DSL re-exports neither.
+  ;; the version is rewritten through a regular expression.  The DSL
+  ;; re-exports the file helpers, but not the regexp one.
   #:use-module (ice-9 regex)
-  #:use-module (ice-9 textual-ports)
   #:declarative? #t)
 
 ;; ====== Maak constants ======
@@ -51,8 +50,9 @@
 
 (define (repl)
   "Development REPL."
-  (time-machine-manifest-shell '("guile -L ./lib -L ."
-                                 "-c '((@ (ares server) run-nrepl-server))'")))
+  (time-machine-manifest-shell
+   (list "guile" "-L" "./lib" "-L" "."
+         "-c" "'((@ (ares server) run-nrepl-server))'")))
 
 (define (default)
   "Default task to be run, list available tasks."
@@ -68,14 +68,14 @@
   "Hot-reloading developer's setup."
   (time-machine-manifest-shell (list "watchexec"
                                      "--clear"
-                                     (~ "--exts ~a"
-                                        (string-join (map symbol->string
-                                                      hot-reload-file-types)
-                                                     ","))
+                                     "--exts"
+                                     (string-join (map symbol->string
+                                                       hot-reload-file-types)
+                                                  ",")
                                      "--on-busy-update=restart"
-                                     "--shell bash"
-                                     "--watch . --"
-                                     "maak server")))
+                                     "--shell" "bash"
+                                     "--watch" "." "--"
+                                     "maak" "server")))
 
 (define (hr)
   "Alias to hot-reloading."
@@ -91,18 +91,22 @@
 The short wait afterwards is not politeness: a server that has been signalled
 has not necessarily released the port by the time the next one binds it, and
 the second bind then fails with an address already in use."
-  ($ (list (~ "fuser -k ~a/tcp || true" http-port)))
+  ;; Nothing listening is not a failure, so the command is allowed to say so
+  ;; instead of the task dying on `fuser''s non-zero exit.
+  (run (list "fuser" "-k" (~ "~a/tcp" http-port))
+       #:allow-failure? #t)
   (run (list "sleep" "1")))
 
 (define (server)
   "Target to start the torikomi server with the default configuration."
   (kill-server)
-  (time-machine-manifest-shell '("art work")))
+  (time-machine-manifest-shell (list "art" "work")))
 
 (define (production-server)
   "Target to start the torikomi server with the production configuration."
   (kill-server)
-  (time-machine-manifest-shell '("art work -c conf/production.conf")))
+  (time-machine-manifest-shell (list "art" "work"
+                                     "-c" "conf/production.conf")))
 
 (define (sink-dir)
   "Create the directory sunk files are written to.
@@ -138,8 +142,10 @@ shape is loaded afterwards as if it still had the old one.  Compiling from
 source every run costs a few seconds and makes the reading depend on the specs
 alone, which is what a suite that is run to judge a change has to do."
   (time-machine-manifest-shell
-   (list "guile --fresh-auto-compile -L ./lib -L . -L ./test"
-         "-c '(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
+   (list "guile" "--fresh-auto-compile"
+         "-L" "./lib" "-L" "." "-L" "./test"
+         "-c"
+         "'(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
 
 ;; ====== The version, and its release ======
 ;;
@@ -173,9 +179,8 @@ The load path is extended with the `lib' of the checkout rather than with one
 named by the caller, so that the module these tasks read is the one the tree
 holds and not one installed elsewhere."
   (unless (file-exists? version-source)
-    (error (format #f
-                   "no ~a here; run maak from the root of a torikomi checkout"
-                   version-source)))
+    (task-error "no ~a here" #:args (list version-source)
+                #:hint "Run maak from the root of a torikomi checkout."))
   (unless (member "./lib" %load-path)
     (set! %load-path (cons "./lib" %load-path)))
   (resolve-module '(torikomi version) #:ensure #t))
@@ -194,30 +199,18 @@ reading has to come from there and not from whatever torikomi a load path
 happens to name."
   (let ((file (if (string=? directory ".")
                   version-source
-                  (string-append directory "/" version-source))))
+                  (~ "~a/~a" directory version-source))))
     (unless (file-exists? file)
-      (error (format #f "no ~a in ~a; name the checkout's root"
-                     version-source directory)))
+      (task-error "no ~a in ~a" #:args (list version-source directory)
+                  #:hint "Name the checkout's root as DIRECTORY."))
     (let ((found (string-match
                   "torikomi-version[ \t\n]+\"([0-9]+\\.[0-9]+\\.[0-9]+)\""
-                  (call-with-input-file file get-string-all))))
+                  (read-file file))))
       (unless found
-        (error (format #f
-                       "~a does not define torikomi-version as a version"
-                       file)))
+        (task-error "~a does not define torikomi-version as a version"
+                    #:args (list file)
+                    #:hint "Write the version there as a string, `X.Y.Z'."))
       (match:substring found 1))))
-
-(define (git-exit directory . arguments)
-  "The exit code git ended with, run in DIRECTORY with ARGUMENTS.
-
-`system*' answers with the wait status rather than the exit code -- a command
-that exited 1 reads as 256 -- so it is divided back down here, and a git that
-could not be started at all reads as the 127 a shell would report.  The
-arguments are a list rather than a command line, so a commit message with
-spaces or quotes in it reaches git as one argument and no shell splits it
-again."
-  (let ((status (apply system* "git" "-C" directory arguments)))
-    (if status (quotient status 256) 127)))
 
 (define* (sync-version #:optional (directory "."))
   "Write the version into every file that cannot read it, then release it.
@@ -244,18 +237,18 @@ library, so the task releases the tree it was started in."
   (define (path file)
     (if (string=? directory ".")
         file
-        (string-append directory "/" file)))
+        (~ "~a/~a" directory file)))
 
   (define (read-text file)
-    (if (file-exists? (path file))
-        (call-with-input-file (path file) get-string-all)
-        (error (format #f
-                       "sync-version: no ~a in ~a; name the checkout's root"
-                       file directory))))
+    (let ((full (path file)))
+      (if (file-exists? full)
+          (read-file full)
+          (task-error "sync-version: no ~a in ~a"
+                      #:args (list file directory)
+                      #:hint "Name the checkout's root as DIRECTORY."))))
 
   (define (write-text file text)
-    (call-with-output-file (path file)
-      (lambda (port) (display text port))))
+    (write-file (path file) text))
 
   (define (rewrite text pattern version)
     "Return TEXT with the version PATTERN names replaced by VERSION."
@@ -276,49 +269,70 @@ library, so the task releases the tree it was started in."
           #f
           (begin (write-text file rewritten) #t))))
 
+  ;; ---- The commit and the tag --------------------------------------------
+  ;;
+  ;; The git wrappers take `#:directory', so a release of another checkout
+  ;; commits there rather than wherever maak was started from.
+
+  (define (changes-to-commit?)
+    "Return whether anything tracked differs from the last commit."
+    (not (string=? ""
+                   (string-trim-both
+                    (git-output (list "diff" "--name-only" "HEAD")
+                                #:directory repo)))))
+
+  (define (commit-release message)
+    "Commit every tracked change as the release MESSAGE."
+    (unless (git (list "commit" "--all" "-m" message)
+                 #:directory repo #:allow-failure? #t)
+      (task-error "sync-version: git commit failed, so nothing was tagged"
+                  #:hint "Resolve what git refused in the checkout, then run the task again.")))
+
+  (define (tag-release version)
+    "Tag the current commit as the release VERSION."
+    (unless (git (list "tag" (~ "v~a" version))
+                 #:directory repo #:allow-failure? #t)
+      (task-error "sync-version: `git tag v~a' failed; the release was committed, but not tagged"
+                  #:args (list version)
+                  #:hint "Tag the commit by hand, or remove it and run the task again.")))
+
   (let* ((version (checkout-version directory))
-         (tag (string-append "v" version)))
+         (tag (~ "v~a" version)))
     ;; A tree that is not a checkout has nothing to commit and nothing to tag,
     ;; and a release that was half made is worse than one that was refused.
     (unless (file-exists? (path ".git"))
-      (error (format #f
-                     "sync-version: ~a is not a git checkout, so there is nothing to commit or tag"
-                     directory)))
-    ;; `show-ref --quiet' answers with its exit status and prints nothing, which
-    ;; `rev-parse --verify' does not: a release that is refused should say why
-    ;; and nothing else.
-    (when (zero? (git-exit repo "show-ref" "--verify" "--quiet"
-                           (string-append "refs/tags/" tag)))
-      (error (format #f
-                     "sync-version: ~a is already released as ~a; bump ~a first"
-                     version tag version-source)))
+      (task-error "sync-version: ~a is not a git checkout, so there is nothing to commit or tag"
+                  #:args (list directory)
+                  #:hint "Run the task in a checkout, or name one as DIRECTORY."))
+    ;; The tag is looked for among the checkout's tags rather than asked for
+    ;; with `show-ref --verify', so a refusal can name the release that is
+    ;; already there and nothing else.
+    (when (member tag (git-tags #:directory repo))
+      (task-error "sync-version: ~a is already released as ~a; bump ~a first"
+                  #:args (list version tag version-source)
+                  #:hint "Raise the version in the version file, then run the task again."))
     (for-each (lambda (site)
                 (when (sync-copy! site version)
                   (log-info "Wrote ~a into ~a." version (car site))))
               version-sites)
-    (if (zero? (git-exit repo "diff" "--quiet" "HEAD"))
+    (if (changes-to-commit?)
+        (let ((message (~ "chore: Release v~a" version)))
+          (commit-release message)
+          (tag-release version)
+          (log-info "Committed `~a' and tagged ~a." message tag))
         (begin
-          (unless (zero? (git-exit repo "tag" tag))
-            (error (format #f
-                           "sync-version: `git tag ~a' failed; nothing was released"
-                           tag)))
+          (tag-release version)
           (log-info "Nothing to commit; tagged ~a at the current commit."
-                    tag))
-        (let ((message (format #f "chore: Release v~a" version)))
-          (unless (zero? (git-exit repo "commit" "-am" message))
-            (error "sync-version: git commit failed, so nothing was tagged"))
-          (unless (zero? (git-exit repo "tag" tag))
-            (error (format #f
-                           "sync-version: `git tag ~a' failed; the release was committed, but not tagged"
-                           tag)))
-          (log-info "Committed `~a' and tagged ~a." message tag)))))
+                    tag)))))
 
 ;; ====== Fetching the project's own resources ======
 
 (define (test-local-api-call)
   "Test out a local REST API call."
-  ($ '("http POST localhost:50027/api/v1/sink-file"
-       "file-url=https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png")))
+  ;; `file-url=...' comes after the program, so it is one argument to `http'
+  ;; rather than a shell assignment: no shell is needed, and none is used.
+  (run (list "http" "POST" "localhost:50027/api/v1/sink-file"
+             "file-url=https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-small.png")))
 
 (define (olive-css)
   "Refresh the Olive CSS the page is styled by.
@@ -332,6 +346,6 @@ task is run, or the classes it asks for simply will not exist.
 `--fail' is what makes a 404 an error rather than a saved error page, and
 `--location' follows the redirect a raw branch URL answers with; without either,
 a broken download would be written over the stylesheet."
-  ($ '("curl --fail --silent --show-error --location"
-       "--output \"./pub/css/torikomi.olive.min.css\""
-       "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/torikomi.olive.min.css\"")))
+  (curl-download
+   "https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/torikomi.olive.min.css"
+   #:output "./pub/css/torikomi.olive.min.css"))
