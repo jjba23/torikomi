@@ -202,10 +202,18 @@ In summary, we foster an inclusive, respectful, and cooperative environment for 
 
 -------
 
-** On Lucida fonts
+** On fonts
 
-Lucida fonts are proprietary typefaces originally developed by Bigelow & Holmes. They remain a long-time favorite for many people and are very legible in many situations and hardware/software. While they are bundled pre-installed on many operating systems and platforms, they remain proprietary fonts.
+The interface is set in three libre families, all under the SIL Open Font
+License 1.1, and named by the Olive CSS build this project ships: *Work Sans*
+for prose, *Source Serif 4* for long-form reading and *JuliaMono* for code.
 
-You may use these font files under principles of fair use or for local development and non-commercial purposes, provided it is not for profit and used without securing a proper commercial license where required by law. Users and contributors are solely responsible for ensuring their usage complies with applicable software licensing terms and intellectual property rights.
+They are not bundled here: the stylesheet names them, and a page that serves
+their woff2 files renders in them, while a page that does not falls back to the
+system's own sans, serif and monospace faces. The files are published at
+[[https://fonts.google.com/][Google Fonts]] (Work Sans, Source Serif 4) and at
+[[https://juliamono.netlify.app/][juliamono.netlify.app]] (JuliaMono, which is
+not in the Google Fonts catalogue); self-host them beside your own stylesheet
+if you want the page set in them without asking a third party for the files.
 
 -------
