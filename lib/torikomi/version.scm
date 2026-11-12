@@ -44,7 +44,7 @@
             print-version))
 
 (define torikomi-version
-  "0.1.1")
+  "0.2.4")
 
 (define torikomi-homepage
   "https://codeberg.org/jjba23/torikomi")
