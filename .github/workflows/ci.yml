@@ -20,4 +20,3 @@ jobs:
       tasks: maak-test pull-and-restart
       daemon-name: torikomi-daemon
     secrets: inherit
-    timeout-minutes: 60
