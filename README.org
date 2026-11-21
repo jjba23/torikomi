@@ -36,8 +36,6 @@ This is torikomi version 0.2.4.  ~maak version~ prints it, and ~maak sync-versio
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
-[[https://jointhefreeworld.org/static-assets/torikomi/screen-2026-01-12-23-25-46-small.png]]
-
 ** The endpoints
 
 - ~GET /~ is the homepage.
