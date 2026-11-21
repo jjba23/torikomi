@@ -32,7 +32,7 @@
             print-version))
 
 (define torikomi-version
-  "0.2.4")
+  "0.3.0")
 
 (define torikomi-homepage
   "https://github.com/jjba23/torikomi")
