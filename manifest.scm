@@ -188,7 +188,7 @@ concurrently by default.")
   ;; defined by the jointhefreeworld channel channels.scm pins, so it is
   ;; resolved by name against the channels rather than imported here.
   (specification->package "guile-dokgen")
-  texinfo
+  (specification->package "texinfo")
 
   ;; Guile and the libraries the source imports.
   guile-3.0-latest
