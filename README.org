@@ -24,8 +24,6 @@ Since torikomi is built to create multimedia archives, when conflicting between 
 
 This is torikomi version 0.2.4.  ~maak version~ prints it, and ~maak sync-version~ keeps the copies in this manual in step with ~lib/torikomi/version.scm~.
 
-[[https://jointhefreeworld.org/static-assets/torikomi/torikomi-logo-tiny.png]]
-
 - Supports traditional HTML forms and modern JSON REST endpoints.
 - A frosted-glass interface with a light and a dark theme: the theme follows the system by default, is remembered once chosen, and is applied before the first paint.
 - Minimalist Core: Built on the powerful Guile Scheme language.
@@ -35,6 +33,8 @@ This is torikomi version 0.2.4.  ~maak version~ prints it, and ~maak sync-versio
 - TODO: Let user create auto tar-ball or zip
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
+[[https://jointhefreeworld.org/static-assets/torikomi/screen-2026-01-12-23-25-46-small.png]]
 
 ** The endpoints
 
