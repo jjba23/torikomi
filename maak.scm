@@ -10,9 +10,15 @@
   ;; the version is rewritten through a regular expression.  The DSL
   ;; re-exports the file helpers, but not the regexp one.
   #:use-module (ice-9 regex)
+  ;; `scandir' lists the mermaid sources the `diagrams' task renders.
+  #:use-module (ice-9 ftw)
   #:declarative? #t)
 
 ;; ====== Maak constants ======
+
+;; The URL for the CSS stylesheet the API documentation is read with.
+(define api-docs-css-url
+  "https://jointhefreeworld.org/static/css/jointhefreeworld.css")
 
 ;; The TCP port on which the web server will listen.  It is the same port
 ;; `conf/artanis.conf' names, and `kill-server' uses it to stop whatever is
@@ -135,6 +141,70 @@ alone, which is what a suite that is run to judge a change has to do."
          "-L" "./lib" "-L" "." "-L" "./test"
          "-c"
          "'(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
+
+;; ====== The documentation ======
+
+(define (docs)
+  "Generate torikomi's API reference and render it as HTML.
+
+The reference is taken from ./lib/torikomi -- `(torikomi torikomi)',
+`(torikomi preferences)' and `(torikomi version)' -- which is the library the
+program is: the sink, the settings a deployment decides and the version banner.
+The Artanis files under app/ are a second root, and `dokgen' names a module from
+the parent of the path it is given, so a run over both at once would look for
+`(lib app views index)'.  They are therefore left to the page they render and
+the routes they register, both of which the tests read; the library is what the
+reference documents.
+
+`dokgen' writes the chapter to doc/api, drawing every mermaid diagram a
+commentary carries into doc/api/diagrams.  `texi2any' copies neither a
+stylesheet, a script nor an image into its output, so the HTML goes to
+doc/api-dist and the three are copied beside it afterwards."
+  (delete-file-recursively "doc")
+  (time-machine-manifest-shell
+   (list "dokgen" "api"
+         "--destination" "doc/api"
+         "./lib/torikomi")
+   #:verbose? #t)
+  (mkdir-p "doc/api-dist")
+  ;; `-I doc/api' is what finds the diagrams beside the chapter, and
+  ;; `--no-split' keeps the reference one page.
+  (time-machine-manifest-shell
+   (list "texi2any" "-v" "--html" "--no-split"
+         (~ "--css-ref=~a" api-docs-css-url)
+         "-I" "doc/api"
+         "-c" (shell-quote
+               (string-append
+                "EXTRA_HEAD="
+                "<link rel=\"stylesheet\" href=\"dokgen.css\">"
+                "<script src=\"dokgen.js\" defer></script>"))
+         "-o" "doc/api-dist/index.html"
+         "./doc/api/index.texi")
+   #:verbose? #t)
+  (for-each (lambda (asset)
+              (when (file-exists? (~ "doc/api/~a" asset))
+                (cp (~ "doc/api/~a" asset) "doc/api-dist"
+                    #:force? #t #:verbose? #t)))
+            '("dokgen.css" "dokgen.js"))
+  (when (file-exists? "doc/api/diagrams")
+    (cp "doc/api/diagrams" "doc/api-dist" #:force? #t #:verbose? #t)))
+
+(define (diagrams)
+  "Render every mermaid source under resources/diagrams to the SVG beside it.
+
+The images are committed, so this runs only when a diagram's source changes; the
+diagrams the API reference itself shows are drawn by `dokgen' during `docs'."
+  (for-each
+   (lambda (name)
+     (let* ((source (in-vicinity "resources/diagrams" name))
+            (image (string-append (string-drop-right source 4) ".svg")))
+       (run (list "mmdc" "-i" source "-o" image
+                  "--backgroundColor" "transparent")
+            #:verbose? #t)))
+   (scandir "resources/diagrams"
+            (lambda (name)
+              (and (not (member name '("." "..")))
+                   (string-suffix? ".mmd" name))))))
 
 ;; ====== The version, and its release ======
 ;;

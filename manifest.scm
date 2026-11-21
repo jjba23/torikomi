@@ -13,7 +13,8 @@
 ;;; `fuser', `mkdir', `curl' and `guile' itself, so they are named here rather
 ;;; than borrowed from whatever the developer's profile happens to hold.
 
-(use-modules (guix packages)
+(use-modules (gnu packages)
+             (guix packages)
              (gnu)
              (guix utils)
              (guix gexp)
@@ -181,6 +182,13 @@ concurrently by default.")
   ;; The build and release tooling.
   (specification->package "make")
   (specification->package "gettext")
+
+  ;; The API documentation: `dokgen' writes the chapter out of the modules'
+  ;; docstrings, and `texi2any' renders it as one HTML page.  guile-dokgen is
+  ;; defined by the jointhefreeworld channel channels.scm pins, so it is
+  ;; resolved by name against the channels rather than imported here.
+  (specification->package "guile-dokgen")
+  texinfo
 
   ;; Guile and the libraries the source imports.
   guile-3.0-latest

@@ -28,6 +28,20 @@
 ;; The helpers are exported on purpose.  They are where the decisions are, and
 ;; the suite under test/veritas/unit reads them directly instead of standing up
 ;; a server to observe a filename.
+;;
+;; ```mermaid
+;; flowchart LR
+;;   request["POST /api/v1/sink-file<br/>or the page's form"] --> sink["sink-file<br/>#:url #:name"]
+;;   sink --> validate["validate-url<br/>scheme allow-list"]
+;;   validate --> download["download<br/>redirects, retries, size cap"]
+;;   download --> name["choose-basename<br/>choose-extension"]
+;;   name --> write["write-download!<br/>into sink-directory"]
+;;   write --> result["sink-result<br/>200 with public-url<br/>or 4xx/5xx with a message"]
+;;   validate -.->|"sink-error"| result
+;;   download -.->|"sink-error"| result
+;; ```
+;;
+;; `fetch-file' is the same path with the record turned into an exception.
 
 ;;; Code:
 

@@ -7,3 +7,4 @@ env.scm
 tmp/
 pub/tmp/
 reports/
+doc/

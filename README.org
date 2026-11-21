@@ -64,6 +64,24 @@ It is also possible that DNS resolution was not successful for a URL from within
 
 I mainly use torikomi to create image or file archives, for example, for [[https://wikimusic.jointhefreeworld.org][wikimusic]], see my library at [[https://visus-aeternus.jointhefreeworld.org]]
 
+** What a sink does
+
+#+attr_html: :width 720 :alt A URL validated, downloaded, named, written and answered as a sink-result
+[[file:resources/diagrams/sink-file.svg]]
+
+A request is a URL and an optional name; everything after that is what
+~lib/torikomi/torikomi.scm~ describes.  The URL is checked against the schemes
+the deployment allows, the body is fetched, a name is chosen from the response
+header and the address itself, and the bytes are written into the sink
+directory.  The answer is a ~sink-result~ either way: a success carrying the
+name, the path, the public URL and the size, or a failure carrying a status and
+a sentence a reader can act on.  ~POST /sink-file~ and
+~POST /api/v1/sink-file~ are two ways to ask the same procedure.
+
+The source of the diagram is
+[[file:resources/diagrams/sink-file.mmd][resources/diagrams/sink-file.mmd]]; ~maak diagrams~
+renders every source under ~resources/diagrams~ to the SVG beside it.
+
 ** What it does when the network is not perfect
 
 A sink is a request made on somebody else's behalf to a server nobody here
@@ -150,6 +168,8 @@ The project uses [[https://github.com/jjba23/maak][maak]]; the tasks worth knowi
 | ~maak server~         | Start the development server on port 50027.                         |
 | ~maak production-server~ | Start it with ~conf/production.conf~.                          |
 | ~maak test~           | Run the suite under ~test/veritas/unit~.                            |
+| ~maak docs~           | Write the API reference to ~doc/api-dist/index.html~ with dokgen.    |
+| ~maak diagrams~       | Render every mermaid source under ~resources/diagrams~.             |
 | ~maak sink-dir~       | Create the sink directory the configuration names.                  |
 | ~maak version~        | Print the version, licence and homepage.                            |
 | ~maak sync-version~   | Write the version into the files that cannot read it, commit and tag. |
