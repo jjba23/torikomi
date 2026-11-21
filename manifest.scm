@@ -1,19 +1,7 @@
-;;; torikomi
-
+;; torikomi
+;;
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; torikomi is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; torikomi is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; The development environment, pinned the way the project's sibling
 ;;; (~/Hacking/byggsteg) pins its own: the Scheme libraries are defined here,
@@ -28,6 +16,7 @@
 (use-modules (guix packages)
              (gnu)
              (guix utils)
+             (guix gexp)
              (guix git-download)
              (guix download)
              (guix build-system gnu)
@@ -58,7 +47,7 @@
 (define-public guile-uuid
   (package
     (name "guile-uuid")
-    (version "0.9.0")
+    (version "0.9.1")
     (source
      (origin
        (method git-fetch)
@@ -67,9 +56,18 @@
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0g508aajkyi513wbhm1rhs03ilnb701lwlrvppkmc0vynydlk9ws"))))
+        (base32 "01gza8zsjmazc02p9vm7pgidvfzdi786asc7c4r8cnjxdn3sigvd"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0 guile-gcrypt))
+    ;; 0.9.1 keeps its Guix recipe in the source tree, and the Guile build
+    ;; system would compile it as library code and stop at `(guix gexp)'.
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'drop-packaging-recipe
+            (lambda _
+              (delete-file "guix.scm"))))))
     (home-page "https://codeberg.org/elb/guile-uuid")
     (synopsis "UUID generation and manipulation library for Guile Scheme")
     (description
@@ -85,7 +83,7 @@ between binary and hex-and-dash string UUIDs are included.")
 (define-public guile-kracht
   (package
     (name "guile-kracht")
-    (version "0.3.0")
+    (version "0.3.8")
     (source
      (origin
        (method git-fetch)
@@ -94,7 +92,7 @@ between binary and hex-and-dash string UUIDs are included.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0ayazqxg5rcvfpabfican1a2mzix63nklj06ksdb34zlbbiqzcjr"))))
+        (base32 "1v2n50hqwlihscl7f5y9hp815aznyrzzpk96whflqaqvjnzyxzb0"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -113,16 +111,16 @@ between binary and hex-and-dash string UUIDs are included.")
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "2.5.0")
+    (version "2.8.6")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://codeberg.org/jjba23/hygguile.git")
+             (url "https://github.com/jjba23/hygguile.git")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1vdqzxs2n97iqk53p0an3fzxrghh12q14v3ahm84yf7pcyyyny2d"))))
+        (base32 "11vdz9vfhxmsx89m59l2cv8j7gsfdh7yz1pnz639mrzkl8dj2qx4"))))
     (build-system guile-build-system)
     ;; guile-uuid pulls in guile-gcrypt at compile time: the UUID module opens
     ;; `(gcrypt random)' and `(gcrypt hash)' while it is being compiled, so the
@@ -132,7 +130,7 @@ between binary and hex-and-dash string UUIDs are included.")
     (arguments
      (list
       #:source-directory "src"))
-    (home-page "https://codeberg.org/jjba23/hygguile")
+    (home-page "https://github.com/jjba23/hygguile")
     (synopsis "Web UI component library for Guile Scheme projects")
     (description
      "Hygguile is a library that allows you to create cozy web user-interfaces
@@ -142,7 +140,7 @@ and by leveraging the power of S-expressions, SXML and TailwindCSS.
 The project aims to provide reusable, professional-looking and accessible
 web components, whose names resemble the HTML counterparts, thus
 easing the learning curve, and reducing the cognitive load.")
-    (license license:lgpl3+)))
+    (license license:expat)))
 
 ;;; Veritas is the test framework `maak test' runs.  Specs are discovered under
 ;;; test/veritas/unit and their suites are named `(veritas unit ...)', so the
@@ -151,30 +149,30 @@ easing the learning curve, and reducing the cognitive load.")
 (define-public guile-veritas
   (package
     (name "guile-veritas")
-    (version "0.9.0")
+    (version "1.4.5")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://codeberg.org/jjba23/veritas.git")
+             (url "https://github.com/jjba23/veritas.git")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1pr8yjnxkrp2fylmn8ihjapin7iz94jqi4hbc6yd0ajll11ajxc9"))))
+        (base32 "1abf6vxhrw2q1g8xplqcd7xavn3dv59ir4d77xmpyds1mfijv338"))))
     (build-system guile-build-system)
     (arguments
      (list
       #:source-directory "src"))
     (native-inputs (list guile-3.0))
     (propagated-inputs (list guile-fibers guile-json-4))
-    (home-page "https://codeberg.org/jjba23/veritas")
+    (home-page "https://github.com/jjba23/veritas")
     (synopsis "Testing framework for Guile")
     (description
      "Veritas is a testing framework for Guile with an @acronym{EDSL,
 embedded domain specific language} to define test suites.  Emphasis is placed
 on legible, maintainable tests.  Veritas shuffles tests and runs them
 concurrently by default.")
-    (license license:lgpl3+)))
+    (license license:expat)))
 
 ;;; ====== The environment ======
 

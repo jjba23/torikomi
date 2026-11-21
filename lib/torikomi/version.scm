@@ -1,19 +1,7 @@
-;;; torikomi
-
+;; torikomi
+;;
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; torikomi is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; torikomi is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 ;;
@@ -47,10 +35,10 @@
   "0.2.4")
 
 (define torikomi-homepage
-  "https://codeberg.org/jjba23/torikomi")
+  "https://github.com/jjba23/torikomi")
 
 (define torikomi-license
-  "AGPL-3.0-or-later")
+  "MIT")
 
 (define (torikomi-version-string)
   "The one-line version banner: the program's name and the release it is."

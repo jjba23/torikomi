@@ -6,7 +6,7 @@
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]
 [[https://jointhefreeworld.org/ggg/dist/gnu-make.svg]]
-[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
+[[https://jointhefreeworld.org/ggg/dist/license-mit.svg]]
 [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 
 #+attr_html: :width 160 :alt torikomi logo
@@ -27,7 +27,8 @@ This is torikomi version 0.2.4.  ~maak version~ prints it, and ~maak sync-versio
 - Supports traditional HTML forms and modern JSON REST endpoints.
 - A frosted-glass interface with a light and a dark theme: the theme follows the system by default, is remembered once chosen, and is applied before the first paint.
 - Minimalist Core: Built on the powerful Guile Scheme language.
-- Built using the Lisp powered UI combo ([[https://codeberg.org/jjba23/hygguile][Hygguile]] and [[https://codeberg.org/jjba23/olive-css][Olive CSS]])
+- Built using the Lisp powered UI combo ([[https://github.com/jjba23/hygguile][Hygguile]] and [[https://github.com/jjba23/olive-css][Olive CSS]])
+- Read the source (and send PRs, issues and patches): [[https://github.com/jjba23/torikomi][github.com/jjba23/torikomi]]
 - TODO: Let user choose file conflict strategy?
 - TODO: Let user choose auto-conversion to AVIF or WEBP or others
 - TODO: Let user create auto tar-ball or zip
@@ -141,7 +142,7 @@ A fresh checkout needs no file at all.
 
 ** Development
 
-The project uses [[https://codeberg.org/jjba23/maak][maak]]; the tasks worth knowing:
+The project uses [[https://github.com/jjba23/maak][maak]]; the tasks worth knowing:
 
 | Task                | What it does                                                       |
 |---------------------+--------------------------------------------------------------------|
@@ -162,7 +163,7 @@ manifest.scm~ is the whole development environment.
 
 ** Tests
 
-The suite is [[https://codeberg.org/jjba23/veritas][Veritas]] and lives under
+The suite is [[https://github.com/jjba23/veritas][Veritas]] and lives under
 ~test/veritas/unit~; ~maak test~ runs it, with a locale named rather than
 inherited so that the pages read the same everywhere.
 
@@ -182,13 +183,11 @@ standard output, which belongs to the server's own chatter.
 
 * Licensing
 
-torikomi and all of its source code are free software, licensed under the GNU Affero General Public License v3 (or newer at your convenience).
+torikomi and all of its source code are free software, licensed under the [[https://opensource.org/license/mit][MIT License]].
 
-https://www.gnu.org/licenses/agpl-3.0.html
+The documentation and examples, including this document, which are provided with torikomi, are all licensed under the Creative Commons Attribution 4.0 International License.
 
-The documentation and examples, including this document, which are provided with torikomi, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
-
-https://www.gnu.org/licenses/fdl-1.3.html
+https://creativecommons.org/licenses/by/4.0/
 
 -------
 

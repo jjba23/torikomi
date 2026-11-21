@@ -1,19 +1,7 @@
-;;; torikomi
-
+;; torikomi
+;;
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; torikomi is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; torikomi is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with torikomi.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (maak)
   #:use-module (maak maak)
@@ -171,7 +159,8 @@ alone, which is what a suite that is run to judge a change has to do."
 ;; that group is replaced, so everything around it -- a sentence's wording, a
 ;; field's alignment -- stays the file's business rather than this list's.
 (define version-sites
-  '(("README.org" . "torikomi version ([0-9]+\\.[0-9]+\\.[0-9]+)")))
+  '(("README.org" . "torikomi version ([0-9]+\\.[0-9]+\\.[0-9]+)")
+    ("VISION.md" . "on Guile Scheme, at ([0-9]+\\.[0-9]+\\.[0-9]+)")))
 
 (define (torikomi-version-library)
   "This checkout's `(torikomi version)' module, loaded on demand.
@@ -348,7 +337,7 @@ task is run, or the classes it asks for simply will not exist.
 `--location' follows the redirect a raw branch URL answers with; without either,
 a broken download would be written over the stylesheet."
   (curl-download
-   "https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/torikomi.olive.min.css"
+   "https://raw.githubusercontent.com/jjba23/olive-css/trunk/resources/css/torikomi.olive.min.css"
    #:output "./pub/css/torikomi.olive.min.css"))
 
 ;; ====== Agent skills ======

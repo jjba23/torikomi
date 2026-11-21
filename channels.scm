@@ -1,8 +1,13 @@
+;; torikomi
+;;
+;; SPDX-License-Identifier: MIT
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
 (list (channel
         (name 'guix)
-        (url "https://codeberg.org/guix/guix.git")
+        (url "https://git.guix.gnu.org/guix.git")
         (branch "master")
-        (commit "3b4e87350015c5e5223bcfd5043837e63fd6d635")
+        (commit "230aa373f315f247852ee07dff34146e9b480aec")
         (introduction
          (make-channel-introduction "9edb3f66fd807b096b48283debdcddccfea34bad"
           (openpgp-fingerprint
