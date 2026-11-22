@@ -12,6 +12,8 @@
 #+attr_html: :width 160 :alt torikomi logo
 [[file:logo.svg]]
 
+- 📖 *API reference:* [[https://jointhefreeworld.org/api-docs/torikomi/index.html][Torikomi API reference]]
+
 Torikomi (取り込み): Meaning "ingest," "capture," or "import."  in Japanese.
 
 torikomi is a minimalist web service built with GNU Artanis and Guile Scheme for archiving and building collections and libraries of files.
