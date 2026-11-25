@@ -150,7 +150,7 @@ easing the learning curve, and reducing the cognitive load.")
 (define-public guile-veritas
   (package
     (name "guile-veritas")
-    (version "1.4.5")
+    (version "1.6.0")
     (source
      (origin
        (method git-fetch)
@@ -159,7 +159,7 @@ easing the learning curve, and reducing the cognitive load.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1abf6vxhrw2q1g8xplqcd7xavn3dv59ir4d77xmpyds1mfijv338"))))
+        (base32 "1lb80y2dks68a2jlr5xix9m8pyqnzwiqiaynbl05p463xxhzs0v7"))))
     (build-system guile-build-system)
     (arguments
      (list
