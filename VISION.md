@@ -9,7 +9,7 @@ whose directory is a library somebody can trust, address and audit.
 
 ## Where torikomi is today
 
-torikomi is a GNU Artanis service on Guile Scheme, at 0.3.0. One work endpoint in
+torikomi is a GNU Artanis service on Guile Scheme, at 0.3.7. One work endpoint in
 two shapes — `POST /sink-file` for the form, `POST /api/v1/sink-file` for JSON —
 plus `GET /api/v1/version` and `GET /api/v1/health`. The form answers with the
 same page carrying the sunk file's address or a sentence saying why the fetch
